@@ -1,0 +1,28 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Preview BYU ByteBack on localhost",
+      "type": "process",
+      "command": "python3",
+      "windows": {
+        "command": "py"
+      },
+      "args": ["-m", "http.server", "4173", "--bind", "127.0.0.1"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "detail": "Requires Python 3. Open http://localhost:4173/ in your browser. Stop the server with Ctrl+C in the task terminal."
+    }
+  ]
+}

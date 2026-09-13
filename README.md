@@ -1,26 +1,60 @@
 # BYU ByteBack
 
+**Independent academic project. BYU ByteBack is not affiliated with, sponsored by, or endorsed by Brigham Young University.**
+
 A responsive, single-page landing site for a proposed student initiative that gives unused technology a second life. Built with plain HTML, CSS, and JavaScript. No framework, build process, backend, or external runtime services are required.
 
-## Preview in VS Code
+## Get a local copy
 
-1. Open this project folder in VS Code.
-2. If you use the **Live Server** extension, right-click `index.html` and choose **Open with Live Server**.
-3. Alternatively, open **Terminal → New Terminal** and run:
+Anyone with the project files can run the site on their own computer. On GitHub, choose **Code → Download ZIP** and extract the folder, or clone it:
 
-   ```sh
-   python3 -m http.server 4173 --bind 127.0.0.1
-   ```
+```sh
+git clone https://github.com/ikefoxy/isaac-business-startup.git
+cd isaac-business-startup
+```
 
-4. Visit **http://127.0.0.1:4173**. Stop the server with **Ctrl+C**.
+Open the folder containing `index.html` in VS Code. No `npm install`, account, API key, or build step is needed.
 
-You can also open `index.html` directly, though some browsers restrict local storage on `file://` pages. A local server provides the most reliable form preview.
+## Run on localhost in VS Code
+
+With **Python 3** installed:
+
+1. Choose **Terminal → Run Task**.
+2. Select **Preview BYU ByteBack on localhost**.
+3. Open **http://localhost:4173/** in your browser.
+
+The included task uses `python3` on macOS/Linux and `py` on Windows. Keep its terminal running while viewing the site. Press **Ctrl+C** in that terminal to stop the server.
+
+If you already use the **Live Server** extension, you can instead right-click `index.html` and choose **Open with Live Server**; use the local address it opens.
+
+## Run on localhost from a terminal
+
+From the folder containing `index.html`, run one of these commands.
+
+**macOS / Linux:**
+
+```sh
+python3 -m http.server 4173 --bind 127.0.0.1
+```
+
+**Windows:**
+
+```sh
+py -m http.server 4173 --bind 127.0.0.1
+```
+
+Visit **http://localhost:4173/**. If port 4173 is already serving this project, use the running preview. Otherwise, replace `4173` with an unused port such as `4174` in both the command and browser address. If the Python command is unavailable, install Python 3 or use VS Code's Live Server option above.
+
+`localhost` refers to the viewer's own computer. Sharing a localhost link does not share the website; each viewer needs a local copy and a running preview server. A public website would require a separate hosting step such as GitHub Pages.
+
+You can also open `index.html` directly, though some browsers restrict local storage on `file://` pages. A local server provides the most reliable form preview. All fonts and artwork are included locally, so the site needs no internet connection once downloaded.
 
 ## Files
 
 - `index.html` — Semantic page sections, navigation, form, FAQ, and search/social metadata.
 - `styles.css` — Responsive layouts, visual treatments, reduced-motion support, and focus states.
 - `script.js` — Mobile navigation, CTA interest selection, accessible form validation, local request storage, and scroll reveals.
+- `.vscode/tasks.json` — Ready-to-run localhost preview task for VS Code.
 - `assets/second-life.svg` — Original laptop and circular-economy illustration.
 - `assets/favicon.svg` — Original circular-arrow brand mark.
 - `assets/social-card.svg` — Editable social preview artwork.
