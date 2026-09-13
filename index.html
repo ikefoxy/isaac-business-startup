@@ -1,0 +1,954 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#111b20" />
+    <title>BYU ByteBack | Give Technology Back a Purpose</title>
+    <meta
+      name="description"
+      content="BYU ByteBack is a proposed student initiative that collects, securely wipes, refurbishes, and redistributes unused technology to give devices a second life."
+    />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:title"
+      content="BYU ByteBack | Give Technology Back a Purpose"
+    />
+    <meta
+      property="og:description"
+      content="Turn unused technology into opportunity. Explore a proposed student initiative giving devices a second life and communities a new connection."
+    />
+    <meta property="og:image" content="assets/social-card.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="BYU ByteBack. Give technology back a purpose."
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="script.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <svg
+      class="icon-library"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <defs>
+        <symbol id="i-arrow" viewBox="0 0 24 24">
+          <path d="M5 12h14m-6-6 6 6-6 6" />
+        </symbol>
+        <symbol id="i-up-right" viewBox="0 0 24 24">
+          <path d="M6 18 18 6M6 6h12v12" />
+        </symbol>
+        <symbol id="i-check" viewBox="0 0 24 24">
+          <path d="m5 12 4 4L19 6" />
+        </symbol>
+        <symbol id="i-laptop" viewBox="0 0 24 24">
+          <rect x="5" y="4" width="14" height="12" rx="2" />
+          <path d="m5 16-3 4h20l-3-4M10 20h4" />
+        </symbol>
+        <symbol id="i-shield" viewBox="0 0 24 24">
+          <path d="M12 3 4 6v6c0 5 8 9 8 9s8-4 8-9V6l-8-3Z" />
+          <path d="m8.5 11.5 2.5 2.5 4.5-5" />
+        </symbol>
+        <symbol id="i-cycle" viewBox="0 0 24 24">
+          <path
+            d="M20 8a8 8 0 0 0-13.5-3L3 8m0-5v5h5M4 16a8 8 0 0 0 13.5 3l3.5-3m0 5v-5h-5"
+          />
+        </symbol>
+        <symbol id="i-leaf" viewBox="0 0 24 24">
+          <path
+            d="M20 3c-1 5 2 11-5 14a7 7 0 0 1-9-9c3-6 9-3 14-5ZM4 21 15 10"
+          />
+        </symbol>
+        <symbol id="i-people" viewBox="0 0 24 24">
+          <circle cx="9" cy="8" r="3" />
+          <path
+            d="M3 21v-3a6 6 0 0 1 12 0v3M17 5a3 3 0 0 1 0 6m1 4a5 5 0 0 1 3 4v2"
+          />
+        </symbol>
+        <symbol id="i-spark" viewBox="0 0 24 24">
+          <path
+            d="m12 3 2.4 6.6L21 12l-6.6 2.4L12 21l-2.4-6.6L3 12l6.6-2.4L12 3Z"
+          />
+        </symbol>
+        <symbol id="i-box" viewBox="0 0 24 24">
+          <path d="m3 7 9-4 9 4v11l-9 4-9-4V7Zm0 0 9 4 9-4m-9 4v11M7 5l9 4v4" />
+        </symbol>
+        <symbol id="i-tools" viewBox="0 0 24 24">
+          <path
+            d="M14 5a5 5 0 0 0-6 6l-5 5a3 3 0 0 0 4 4l5-5a5 5 0 0 0 6-6l-3 3-3-3 3-3Z"
+          />
+        </symbol>
+        <symbol id="i-mail" viewBox="0 0 24 24">
+          <rect x="3" y="5" width="18" height="14" rx="2" />
+          <path d="m3 6 9 7 9-7" />
+        </symbol>
+        <symbol id="i-plus" viewBox="0 0 24 24">
+          <path d="M12 5v14M5 12h14" />
+        </symbol>
+        <symbol id="i-lock" viewBox="0 0 24 24">
+          <rect x="5" y="10" width="14" height="11" rx="2" />
+          <path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3" />
+        </symbol>
+        <symbol id="i-building" viewBox="0 0 24 24">
+          <path
+            d="M4 21V3h12v18M16 9h4v12M2 21h20M8 7h4M8 11h4M8 15h4M9 21v-3h3v3"
+          />
+        </symbol>
+      </defs>
+    </svg>
+
+    <header class="site-header">
+      <div class="container nav-shell">
+        <a class="brand" href="#home" aria-label="BYU ByteBack home">
+          <img src="assets/favicon.svg" width="36" height="36" alt="" />
+          <span
+            >BYU <strong>ByteBack</strong><span class="brand-dot">.</span></span
+          >
+        </a>
+        <button
+          class="menu-toggle"
+          type="button"
+          aria-label="Open navigation"
+          aria-expanded="false"
+          aria-controls="primary-nav"
+          hidden
+        >
+          <span></span><span></span>
+        </button>
+        <nav class="primary-nav" id="primary-nav" aria-label="Main navigation">
+          <a href="#how-it-works">How It Works</a>
+          <a href="#why-it-matters">Why It Matters</a>
+          <a href="#organizations">Organizations</a>
+          <a href="#faq">FAQ</a>
+          <a href="#contact">Contact</a>
+          <a
+            class="button button-small"
+            href="#contact"
+            data-interest="Donating a Device"
+            >Donate a Device
+            <svg class="icon" aria-hidden="true"><use href="#i-up-right" /></svg
+          ></a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main">
+      <section class="hero" id="home" aria-labelledby="hero-title">
+        <div class="container hero-grid">
+          <div class="hero-copy">
+            <p class="eyebrow">
+              <span class="status-dot"></span> A SECOND LIFE. A NEW POSSIBILITY.
+            </p>
+            <h1 id="hero-title">
+              Turn unused<br />technology into<br /><span class="accent-text"
+                >opportunity.</span
+              >
+            </h1>
+            <p class="hero-description">
+              That laptop in your drawer still has a future. We’re building a
+              way to collect, securely wipe, and restore unused computers—then
+              put them in the hands of people who need them.
+            </p>
+            <div class="button-group">
+              <a
+                class="button"
+                href="#contact"
+                data-interest="Donating a Device"
+                >Donate a Device
+                <svg class="icon" aria-hidden="true">
+                  <use href="#i-up-right" /></svg
+              ></a>
+              <a class="button button-outline" href="#how-it-works"
+                >Learn How It Works
+                <svg class="icon" aria-hidden="true">
+                  <use href="#i-arrow" /></svg
+              ></a>
+            </div>
+            <p class="hero-footnote">
+              <svg class="icon" aria-hidden="true"><use href="#i-cycle" /></svg>
+              Less waste. More connection. A better next chapter.
+            </p>
+          </div>
+          <figure class="hero-visual">
+            <div class="visual-topline">
+              <span class="tiny-cross">+</span
+              ><span>RETHINK. RESTORE. RECONNECT.</span
+              ><span class="tiny-cross">+</span>
+            </div>
+            <img
+              class="hero-device"
+              src="assets/second-life.svg"
+              alt="An open laptop surrounded by a circular path, illustrating technology restored for a second life."
+              width="660"
+              height="590"
+              fetchpriority="high"
+            />
+            <div class="device-label">
+              <span class="status-dot"></span> READY FOR A NEW CHAPTER
+              <svg class="icon" aria-hidden="true">
+                <use href="#i-up-right" />
+              </svg>
+            </div>
+            <figcaption>Good technology deserves another go.</figcaption>
+          </figure>
+        </div>
+        <div class="container hero-principles">
+          <div>
+            <svg class="icon" aria-hidden="true"><use href="#i-shield" /></svg
+            ><span>Data protection, built in</span>
+          </div>
+          <div>
+            <svg class="icon" aria-hidden="true"><use href="#i-cycle" /></svg
+            ><span>Designed for a second life</span>
+          </div>
+          <div>
+            <svg class="icon" aria-hidden="true"><use href="#i-people" /></svg
+            ><span>Community at the core</span>
+          </div>
+          <span class="principles-note">A student idea. A shared purpose.</span>
+        </div>
+      </section>
+
+      <section class="section problem-section" aria-labelledby="problem-title">
+        <div class="container">
+          <div class="section-heading split-heading" data-reveal>
+            <div>
+              <p class="eyebrow">THE DISCONNECT</p>
+              <h2 id="problem-title">Good technology<br />gets left behind.</h2>
+            </div>
+            <p>
+              Somewhere, a computer sits unused.<br />Somewhere else, someone
+              needs one.<br />We see an opportunity to connect the two.
+            </p>
+          </div>
+          <div class="problem-grid">
+            <article class="problem-card" data-reveal>
+              <div class="card-top">
+                <span class="icon-tile"
+                  ><svg class="icon" aria-hidden="true">
+                    <use href="#i-laptop" /></svg></span
+                ><span class="card-index">01</span>
+              </div>
+              <h3>Unused Devices</h3>
+              <p>
+                Upgrades happen. Old laptops end up in drawers and storage
+                rooms, with useful life still in them.
+              </p>
+            </article>
+            <article class="problem-card" data-reveal>
+              <div class="card-top">
+                <span class="icon-tile"
+                  ><svg class="icon" aria-hidden="true">
+                    <use href="#i-leaf" /></svg></span
+                ><span class="card-index">02</span>
+              </div>
+              <h3>Growing E-Waste</h3>
+              <p>
+                When usable technology gets discarded, valuable materials—and
+                possibilities—go to waste.
+              </p>
+            </article>
+            <article class="problem-card" data-reveal>
+              <div class="card-top">
+                <span class="icon-tile"
+                  ><svg class="icon" aria-hidden="true">
+                    <use href="#i-people" /></svg></span
+                ><span class="card-index">03</span>
+              </div>
+              <h3>Unequal Access</h3>
+              <p>
+                A reliable computer opens doors to learning, work, and
+                connection. For many, it’s still out of reach.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section
+        class="section process-section"
+        id="how-it-works"
+        aria-labelledby="process-title"
+      >
+        <div class="container">
+          <div class="section-heading centered" data-reveal>
+            <p class="eyebrow">A SIMPLE IDEA. A THOUGHTFUL PROCESS.</p>
+            <h2 id="process-title">From forgotten to useful again.</h2>
+            <p>Four steps to give your old technology a new purpose.</p>
+          </div>
+          <ol class="process-grid">
+            <li class="process-step" data-reveal>
+              <div class="step-line">
+                <span class="step-number">01</span
+                ><svg class="icon" aria-hidden="true">
+                  <use href="#i-arrow" />
+                </svg>
+              </div>
+              <span class="process-icon"
+                ><svg class="icon" aria-hidden="true"><use href="#i-box" /></svg
+              ></span>
+              <h3>Collect</h3>
+              <p>Give unwanted laptops and computers a place to go.</p>
+              <span class="step-note">IT STARTS WITH YOU</span>
+            </li>
+            <li class="process-step" data-reveal>
+              <div class="step-line">
+                <span class="step-number">02</span
+                ><svg class="icon" aria-hidden="true">
+                  <use href="#i-arrow" />
+                </svg>
+              </div>
+              <span class="process-icon"
+                ><svg class="icon" aria-hidden="true">
+                  <use href="#i-shield" /></svg
+              ></span>
+              <h3>Protect</h3>
+              <p>
+                Securely erase previous-owner data before a device moves on.
+              </p>
+              <span class="step-note">PRIVACY COMES FIRST</span>
+            </li>
+            <li class="process-step" data-reveal>
+              <div class="step-line">
+                <span class="step-number">03</span
+                ><svg class="icon" aria-hidden="true">
+                  <use href="#i-arrow" />
+                </svg>
+              </div>
+              <span class="process-icon"
+                ><svg class="icon" aria-hidden="true">
+                  <use href="#i-tools" /></svg
+              ></span>
+              <h3>Restore</h3>
+              <p>
+                Inspect, clean, repair, and refurbish devices with life left in
+                them.
+              </p>
+              <span class="step-note">A LITTLE CARE GOES FAR</span>
+            </li>
+            <li class="process-step" data-reveal>
+              <div class="step-line">
+                <span class="step-number">04</span
+                ><svg class="icon" aria-hidden="true">
+                  <use href="#i-check" />
+                </svg>
+              </div>
+              <span class="process-icon"
+                ><svg class="icon" aria-hidden="true">
+                  <use href="#i-people" /></svg
+              ></span>
+              <h3>Reconnect</h3>
+              <p>
+                Place working technology with students, families, and neighbors.
+              </p>
+              <span class="step-note">THE NEXT CHAPTER BEGINS</span>
+            </li>
+          </ol>
+          <p class="process-footnote">
+            <svg class="icon" aria-hidden="true"><use href="#i-cycle" /></svg>
+            Can’t be restored? Devices would be directed to responsible
+            electronics recycling.
+          </p>
+        </div>
+      </section>
+
+      <section
+        class="section impact-section"
+        id="why-it-matters"
+        aria-labelledby="impact-title"
+      >
+        <div class="container">
+          <div class="section-heading split-heading" data-reveal>
+            <div>
+              <p class="eyebrow">SMALL ACT. REAL POSSIBILITY.</p>
+              <h2 id="impact-title">
+                One device can do more<br />than collect dust.
+              </h2>
+            </div>
+            <p>
+              More useful years for technology.<br />More possibilities for
+              people.<br />That’s the future we’re working toward.
+            </p>
+          </div>
+          <div class="impact-grid">
+            <article class="impact-card impact-feature" data-reveal>
+              <span class="impact-category">BETTER FOR THE PLANET</span>
+              <div class="reuse-visual" aria-hidden="true">
+                <div class="reuse-ring ring-one"></div>
+                <div class="reuse-ring ring-two"></div>
+                <div class="reuse-center">
+                  <svg class="icon"><use href="#i-cycle" /></svg>
+                </div>
+                <span class="reuse-satellite satellite-laptop"
+                  ><svg class="icon"><use href="#i-laptop" /></svg></span
+                ><span class="reuse-satellite satellite-leaf"
+                  ><svg class="icon"><use href="#i-leaf" /></svg></span
+                ><span class="orbit-dot"></span>
+              </div>
+              <div>
+                <h3>Reduce Waste</h3>
+                <p>
+                  Keep usable devices in circulation and valuable materials out
+                  of the waste stream.
+                </p>
+              </div>
+            </article>
+            <article class="impact-card" data-reveal>
+              <span class="icon-tile"
+                ><svg class="icon" aria-hidden="true">
+                  <use href="#i-people" /></svg
+              ></span>
+              <div>
+                <span class="impact-category">BETTER FOR OUR COMMUNITY</span>
+                <h3>Expand Access</h3>
+                <p>
+                  Help more students, families, and community members access
+                  reliable technology.
+                </p>
+              </div>
+              <div class="access-visual" aria-hidden="true">
+                <span></span><span></span><span></span><span></span
+                ><svg class="icon"><use href="#i-laptop" /></svg>
+              </div>
+            </article>
+            <article class="impact-card" data-reveal>
+              <span class="icon-tile"
+                ><svg class="icon" aria-hidden="true">
+                  <use href="#i-spark" /></svg
+              ></span>
+              <div>
+                <span class="impact-category">BETTER FOR WHAT’S NEXT</span>
+                <h3>Create Opportunity</h3>
+                <p>
+                  A first résumé. An online class. A new skill. The right tool
+                  can be the start of something bigger.
+                </p>
+              </div>
+              <div class="opportunity-visual" aria-hidden="true">
+                <span></span><span></span><span></span><span></span
+                ><svg class="icon"><use href="#i-up-right" /></svg>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section
+        class="section organizations-section"
+        id="organizations"
+        aria-labelledby="organizations-title"
+      >
+        <div class="container organizations-grid">
+          <div class="organizations-copy" data-reveal>
+            <p class="eyebrow">FOR ORGANIZATIONS</p>
+            <h2 id="organizations-title">
+              Retire technology<br />responsibly.
+            </h2>
+            <p>
+              Your next upgrade could be someone else’s fresh start. We’re
+              seeking local organizations to help shape a simpler, more
+              meaningful way to retire computers.
+            </p>
+            <ul class="benefit-list">
+              <li>
+                <svg class="icon" aria-hidden="true">
+                  <use href="#i-check" />
+                </svg>
+                Convenient, coordinated device collection
+              </li>
+              <li>
+                <svg class="icon" aria-hidden="true">
+                  <use href="#i-check" />
+                </svg>
+                Secure data erasure before reuse
+              </li>
+              <li>
+                <svg class="icon" aria-hidden="true">
+                  <use href="#i-check" />
+                </svg>
+                Responsible refurbishment and recycling
+              </li>
+              <li>
+                <svg class="icon" aria-hidden="true">
+                  <use href="#i-check" />
+                </svg>
+                A direct connection to community opportunity
+              </li>
+            </ul>
+            <a
+              class="button button-outline"
+              href="#contact"
+              data-interest="Business Partnership"
+              >Become a Partner
+              <svg class="icon" aria-hidden="true">
+                <use href="#i-up-right" /></svg
+            ></a>
+          </div>
+          <div class="partner-visual" data-reveal>
+            <div class="partner-top">
+              <span class="eyebrow">AN UPGRADE THAT GOES FURTHER</span
+              ><svg class="icon" aria-hidden="true">
+                <use href="#i-up-right" />
+              </svg>
+            </div>
+            <div class="device-stack" aria-hidden="true">
+              <div class="mini-laptop laptop-back"><span></span></div>
+              <div class="mini-laptop laptop-middle"><span></span></div>
+              <div class="mini-laptop laptop-front">
+                <span
+                  ><svg class="icon"><use href="#i-cycle" /></svg
+                ></span>
+              </div>
+              <div class="stack-ground"></div>
+            </div>
+            <div class="partner-path">
+              <span
+                ><svg class="icon" aria-hidden="true">
+                  <use href="#i-building" />
+                </svg>
+                Your organization</span
+              ><span class="path-dashes"></span
+              ><svg class="icon path-arrow" aria-hidden="true">
+                <use href="#i-arrow" /></svg
+              ><span
+                ><svg class="icon" aria-hidden="true">
+                  <use href="#i-people" />
+                </svg>
+                Our community</span
+              >
+            </div>
+            <p>A better next step for your retired tech.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section mission-section" aria-labelledby="mission-title">
+        <div class="container" data-reveal>
+          <p class="eyebrow">THE FUTURE WE SEE</p>
+          <h2 id="mission-title">
+            Old device. New owner.<br /><span class="accent-text"
+              >New opportunity.</span
+            >
+          </h2>
+          <p class="mission-description">
+            We believe useful technology should keep doing useful things.
+          </p>
+          <ol class="mission-path">
+            <li>
+              <span class="mission-icon"
+                ><svg class="icon" aria-hidden="true">
+                  <use href="#i-laptop" /></svg></span
+              ><span>Unused Device</span>
+            </li>
+            <li class="mission-connector" aria-hidden="true">
+              <span></span><svg class="icon"><use href="#i-arrow" /></svg>
+            </li>
+            <li>
+              <span class="mission-icon"
+                ><svg class="icon" aria-hidden="true">
+                  <use href="#i-cycle" /></svg></span
+              ><span>Refurbished Device</span>
+            </li>
+            <li class="mission-connector" aria-hidden="true">
+              <span></span><svg class="icon"><use href="#i-arrow" /></svg>
+            </li>
+            <li>
+              <span class="mission-icon mission-person"
+                ><svg class="icon" aria-hidden="true">
+                  <use href="#i-people" /></svg></span
+              ><span>Connected Person</span>
+            </li>
+          </ol>
+          <p class="mission-note">
+            Our vision for BYU ByteBack, a proposed student initiative.
+          </p>
+        </div>
+      </section>
+
+      <section
+        class="section contact-section"
+        id="contact"
+        aria-labelledby="contact-title"
+      >
+        <div class="container contact-grid">
+          <div class="contact-copy" data-reveal>
+            <p class="eyebrow">LET’S GIVE GOOD TECH A FUTURE</p>
+            <h2 id="contact-title">Want to<br />get involved?</h2>
+            <p>
+              Have a device to donate? Interested in partnering or volunteering?
+              Tell us how you’d like to be part of the idea.
+            </p>
+            <div class="contact-note">
+              <span class="icon-tile"
+                ><svg class="icon" aria-hidden="true">
+                  <use href="#i-mail" /></svg
+              ></span>
+              <div>
+                <h3>Every connection starts somewhere.</h3>
+                <p>
+                  One device, a room full of computers, or a little of your
+                  time. There’s a place for you here.
+                </p>
+              </div>
+            </div>
+            <div class="prototype-note">
+              <span class="status-dot"></span>
+              <p>
+                <strong>A project in the making.</strong> This is an academic
+                prototype. Requests are saved only in this browser; nothing is
+                sent to a team.
+              </p>
+            </div>
+          </div>
+          <div class="contact-panel" data-reveal>
+            <form
+              id="contact-form"
+              aria-label="Request information"
+              aria-describedby="form-note"
+            >
+              <div class="form-heading">
+                <h3>Start a conversation</h3>
+                <span>* Required</span>
+              </div>
+              <div
+                id="form-error-summary"
+                class="form-error-summary"
+                role="alert"
+                hidden
+              ></div>
+              <div class="form-row">
+                <div class="field">
+                  <label for="full-name"
+                    >Full Name <span aria-hidden="true">*</span></label
+                  ><input
+                    id="full-name"
+                    name="fullName"
+                    type="text"
+                    autocomplete="name"
+                    placeholder="Your full name"
+                    required
+                    maxlength="100"
+                    aria-describedby="full-name-error"
+                  /><span class="field-error" id="full-name-error"></span>
+                </div>
+                <div class="field">
+                  <label for="email"
+                    >Email <span aria-hidden="true">*</span></label
+                  ><input
+                    id="email"
+                    name="email"
+                    type="email"
+                    autocomplete="email"
+                    placeholder="you@example.com"
+                    required
+                    maxlength="254"
+                    aria-describedby="email-error"
+                  /><span class="field-error" id="email-error"></span>
+                </div>
+              </div>
+              <div class="field">
+                <label for="organization"
+                  >Organization <span class="optional">(optional)</span></label
+                ><input
+                  id="organization"
+                  name="organization"
+                  type="text"
+                  autocomplete="organization"
+                  placeholder="Your school, business, or organization"
+                  maxlength="150"
+                />
+              </div>
+              <div class="field">
+                <label for="interest"
+                  >I’m interested in <span aria-hidden="true">*</span></label
+                >
+                <div class="select-wrap">
+                  <select
+                    id="interest"
+                    name="interest"
+                    required
+                    aria-describedby="interest-error"
+                  >
+                    <option value="" disabled selected>
+                      Select an interest
+                    </option>
+                    <option value="Donating a Device">Donating a Device</option>
+                    <option value="Receiving More Information">
+                      Receiving More Information
+                    </option>
+                    <option value="Business Partnership">
+                      Business Partnership
+                    </option>
+                    <option value="Volunteering">Volunteering</option>
+                  </select>
+                </div>
+                <span class="field-error" id="interest-error"></span>
+              </div>
+              <div class="field">
+                <label for="message"
+                  >Message <span aria-hidden="true">*</span></label
+                ><textarea
+                  id="message"
+                  name="message"
+                  rows="4"
+                  placeholder="Tell us a little about how you’d like to get involved…"
+                  required
+                  maxlength="2000"
+                  aria-describedby="message-error"
+                ></textarea
+                ><span class="field-error" id="message-error"></span>
+              </div>
+              <button class="button form-submit" type="submit" disabled>
+                Request Information
+                <svg class="icon" aria-hidden="true">
+                  <use href="#i-up-right" />
+                </svg>
+              </button>
+              <p class="form-note" id="form-note">
+                <svg class="icon" aria-hidden="true">
+                  <use href="#i-lock" />
+                </svg>
+                Prototype only. Saved on this device, never transmitted.
+              </p>
+              <noscript
+                ><p class="no-script-note">
+                  Enable JavaScript to save a prototype request locally. This
+                  form does not send messages.
+                </p></noscript
+              >
+            </form>
+            <div
+              class="form-success"
+              id="form-success"
+              tabindex="-1"
+              aria-labelledby="success-title"
+              hidden
+            >
+              <span class="success-icon"
+                ><svg class="icon" aria-hidden="true">
+                  <use href="#i-check" /></svg
+              ></span>
+              <p class="eyebrow">A FIRST STEP TOWARD SOMETHING GOOD</p>
+              <h3 id="success-title">
+                Your request is<br />saved on this device.
+              </h3>
+              <p>
+                Thanks for exploring BYU ByteBack. This prototype recorded your
+                request locally in this browser. It was
+                <strong>not transmitted</strong>, and no one will contact you
+                from this submission.
+              </p>
+              <div class="saved-interest">
+                <span>YOUR INTEREST</span><strong id="saved-interest"></strong>
+              </div>
+              <button
+                class="button button-outline"
+                id="request-another"
+                type="button"
+              >
+                Start another request
+                <svg class="icon" aria-hidden="true">
+                  <use href="#i-arrow" />
+                </svg></button
+              ><button class="text-button" id="delete-request" type="button">
+                Delete this saved request
+              </button>
+              <p class="deletion-status" id="deletion-status" role="status"></p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section faq-section" id="faq" aria-labelledby="faq-title">
+        <div class="container faq-grid">
+          <div data-reveal>
+            <p class="eyebrow">A LITTLE MORE CLARITY</p>
+            <h2 id="faq-title">Good questions.<br />Clear answers.</h2>
+            <p>Here’s how we’re thinking about<br />the details.</p>
+          </div>
+          <div class="faq-list" data-reveal>
+            <details>
+              <summary>
+                What devices can I donate?<svg class="icon" aria-hidden="true">
+                  <use href="#i-plus" />
+                </svg>
+              </summary>
+              <div class="faq-answer">
+                <p>
+                  Our proposed collection program focuses on unwanted laptops
+                  and desktop computers from students, individuals, and local
+                  organizations. Working and nonworking devices could be
+                  assessed for reuse. Use the
+                  <a href="#contact" data-interest="Donating a Device"
+                    >interest form</a
+                  >
+                  to explore donating; collection arrangements are not yet
+                  available.
+                </p>
+              </div>
+            </details>
+            <details>
+              <summary>
+                How is my data handled?<svg class="icon" aria-hidden="true">
+                  <use href="#i-plus" />
+                </svg>
+              </summary>
+              <div class="faq-answer">
+                <p>
+                  Secure data erasure is a core part of our proposed process.
+                  Previous-owner data would be erased before any device is
+                  redistributed. Detailed handling and verification procedures
+                  would be established before accepting devices. Back up your
+                  files and sign out of your accounts before a future donation.
+                </p>
+              </div>
+            </details>
+            <details>
+              <summary>
+                What happens if a device cannot be refurbished?<svg
+                  class="icon"
+                  aria-hidden="true"
+                >
+                  <use href="#i-plus" />
+                </svg>
+              </summary>
+              <div class="faq-answer">
+                <p>
+                  Devices that cannot be safely and reliably restored would be
+                  directed to responsible electronics recycling. We would
+                  prioritize reuse wherever practical and establish recycling
+                  arrangements before collection begins.
+                </p>
+              </div>
+            </details>
+            <details>
+              <summary>
+                Who can receive refurbished devices?<svg
+                  class="icon"
+                  aria-hidden="true"
+                >
+                  <use href="#i-plus" />
+                </svg>
+              </summary>
+              <div class="faq-answer">
+                <p>
+                  The initiative is intended to support students, families, and
+                  community members who need reliable technology. Eligibility
+                  and distribution details would be developed with community
+                  partners. Devices are not currently available through this
+                  prototype.
+                </p>
+              </div>
+            </details>
+            <details>
+              <summary>
+                Is BYU ByteBack an official BYU organization?<svg
+                  class="icon"
+                  aria-hidden="true"
+                >
+                  <use href="#i-plus" />
+                </svg>
+              </summary>
+              <div class="faq-answer">
+                <p>
+                  No. BYU ByteBack is a proposed student project created for an
+                  academic assignment. It is not affiliated with, sponsored by,
+                  or endorsed by Brigham Young University.
+                </p>
+              </div>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      <section class="final-section" aria-labelledby="final-title">
+        <div class="container">
+          <div class="final-cta" data-reveal>
+            <div class="final-orbits" aria-hidden="true">
+              <span></span><span></span><span></span>
+            </div>
+            <div class="final-copy">
+              <p class="eyebrow">THE NEXT CHAPTER STARTS WITH YOU</p>
+              <h2 id="final-title">Give technology<br />back a purpose.</h2>
+              <p>Your unused device could become someone else’s opportunity.</p>
+              <div class="button-group">
+                <a
+                  class="button button-dark"
+                  href="#contact"
+                  data-interest="Donating a Device"
+                  >Donate a Device
+                  <svg class="icon" aria-hidden="true">
+                    <use href="#i-up-right" /></svg></a
+                ><a
+                  class="button button-dark-outline"
+                  href="#contact"
+                  data-interest="Receiving More Information"
+                  >Request Information
+                  <svg class="icon" aria-hidden="true">
+                    <use href="#i-arrow" /></svg
+                ></a>
+              </div>
+            </div>
+            <svg class="final-symbol icon" aria-hidden="true">
+              <use href="#i-cycle" />
+            </svg>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <div class="footer-top">
+          <div>
+            <a class="brand" href="#home" aria-label="BYU ByteBack home"
+              ><img
+                src="assets/favicon.svg"
+                width="36"
+                height="36"
+                alt=""
+              /><span
+                >BYU <strong>ByteBack</strong
+                ><span class="brand-dot">.</span></span
+              ></a
+            >
+            <p>Give technology back a purpose.</p>
+          </div>
+          <nav class="footer-nav" aria-label="Footer navigation">
+            <a href="#how-it-works">How It Works</a
+            ><a href="#why-it-matters">Why It Matters</a
+            ><a href="#organizations">Organizations</a><a href="#faq">FAQ</a
+            ><a href="#contact">Contact</a>
+          </nav>
+          <div class="footer-domain">
+            <span>PROPOSED DOMAIN</span>
+            <p>
+              byubyteback.org
+              <svg class="icon" aria-hidden="true">
+                <use href="#i-up-right" />
+              </svg>
+            </p>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>© 2026 BYU ByteBack</p>
+          <p>
+            BYU ByteBack is a proposed student project created for an academic
+            assignment. It is not affiliated with, sponsored by, or endorsed by
+            Brigham Young University.
+          </p>
+          <a href="#home" class="back-top" aria-label="Back to top"
+            ><svg class="icon" aria-hidden="true"><use href="#i-arrow" /></svg
+          ></a>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
