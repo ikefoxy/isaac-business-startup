@@ -58,6 +58,7 @@ def init_db():
         CREATE TABLE IF NOT EXISTS inventory (id TEXT PRIMARY KEY, name TEXT, specs TEXT, price INTEGER, source TEXT, state TEXT);
         CREATE TABLE IF NOT EXISTS messages (id TEXT PRIMARY KEY, email TEXT, subject TEXT, body TEXT, status TEXT, created REAL);
         CREATE TABLE IF NOT EXISTS throttles (key TEXT PRIMARY KEY, count INTEGER, expires REAL);
+        CREATE TABLE IF NOT EXISTS rewards (code TEXT PRIMARY KEY, email TEXT, choice TEXT, amount INTEGER, state TEXT, source TEXT UNIQUE, reservation TEXT, created REAL);
         ''')
         if DEMO:
             for item in [('demo-thinkpad', 'Lenovo ThinkPad T480', 'Core i5 · 8 GB RAM · 256 GB SSD · Linux Mint', 79),
@@ -117,6 +118,7 @@ def receipt(order):
             f"Method: {d.get('method', 'Campus pickup')}\n"
             f"Location: {DROP}\n"
             f"Amount due at pickup: ${d.get('price', 0)}\n"
+            f"ByteBack reward applied: ${d.get('discount', 0)}\n"
             f"Pickup pass: {d.get('pass', 'Not applicable')}\n"
             f"Shipping label: {d.get('label_url', 'Available in your dashboard after generation')}\n\n"
             f"View your order: {ORIGIN}/app.html#orders\n"
@@ -214,7 +216,7 @@ class Handler(SimpleHTTPRequestHandler):
         path = urlsplit(self.path).path
         if path.startswith('/api/'):
             return self.dispatch('GET', path)
-        allowed = {'/', '/index.html', '/app.html', '/styles.css', '/script.js', '/app.css', '/app.js', '/qr.js'}
+        allowed = {'/', '/index.html', '/app.html', '/styles.css', '/brand.css', '/script.js', '/app.css', '/app.js', '/qr.js'}
         # Explicit allowlist: never serve .env, SQLite, source files, or .git.
         if path not in allowed and path not in {'/assets/' + p.name for p in (ROOT / 'assets').iterdir() if p.is_file()}:
             return self.send_error(404)
@@ -222,7 +224,7 @@ class Handler(SimpleHTTPRequestHandler):
 
     def do_HEAD(self):
         path = urlsplit(self.path).path
-        allowed = {'/', '/index.html', '/app.html', '/styles.css', '/script.js', '/app.css', '/app.js', '/qr.js'}
+        allowed = {'/', '/index.html', '/app.html', '/styles.css', '/brand.css', '/script.js', '/app.css', '/app.js', '/qr.js'}
         if path not in allowed and path not in {'/assets/' + p.name for p in (ROOT / 'assets').iterdir() if p.is_file()}:
             return self.send_error(404)
         super().do_HEAD()
@@ -255,7 +257,14 @@ class Handler(SimpleHTTPRequestHandler):
             return {'demo': DEMO, 'dropoff': DROP, 'stages': STAGES, 'shipping': DEMO or bool(os.getenv('EASYPOST_API_KEY'))}
         if method == 'GET' and path == '/api/catalog':
             with connect() as db:
-                return {'items': [dict(r) for r in db.execute("SELECT * FROM inventory WHERE state='available' AND (? OR id NOT LIKE 'demo-%')", (DEMO,))]}
+                items = [dict(r) for r in db.execute("SELECT * FROM inventory WHERE state='available' AND (? OR id NOT LIKE 'demo-%')", (DEMO,))]
+                for item in items:
+                    donor = db.execute('SELECT data FROM orders WHERE id=?', (item['source'],)).fetchone()
+                    if donor:
+                        d = json.loads(donor['data'])
+                        item['student_note'] = d.get('student_note', '')
+                        item['donor_name'] = d.get('first_name', '') or 'A fellow student'
+                return {'items': items}
         if method == 'POST' and path == '/api/auth/request':
             self.rate_limit('login-ip:' + self.client_address[0], 30)
             email = str(data.get('email', '')).strip().lower()
@@ -293,6 +302,9 @@ class Handler(SimpleHTTPRequestHandler):
         if path == '/api/messages' and method == 'GET':
             with connect() as db:
                 return {'messages': [dict(r) for r in db.execute("SELECT * FROM messages WHERE email=? AND subject != 'Your ByteBack sign-in link' ORDER BY created DESC", (user['email'],))]}
+        if path == '/api/rewards' and method == 'GET':
+            with connect() as db:
+                return {'rewards': [dict(r) for r in db.execute('SELECT * FROM rewards WHERE email=? ORDER BY created DESC', (user['email'],))]}
         if path == '/api/orders' and method == 'GET':
             with connect() as db:
                 return {'orders': [unpack(r) for r in db.execute('SELECT * FROM orders WHERE email=? ORDER BY created DESC', (user['email'],))]}
@@ -305,6 +317,7 @@ class Handler(SimpleHTTPRequestHandler):
         match = re.fullmatch(r'/api/orders/(BB-[A-F0-9]{12})/([a-z]+)', path)
         require(match and method == 'POST', 'Not found.', 404)
         order_id, action = match.groups()
+        reward_notice = None
         with connect() as db:
             db.execute('BEGIN IMMEDIATE')
             row = db.execute('SELECT * FROM orders WHERE id=?', (order_id,)).fetchone()
@@ -318,6 +331,7 @@ class Handler(SimpleHTTPRequestHandler):
                 history(order, 'Cancelled')
                 if order['kind'] == 'reservation':
                     db.execute("UPDATE inventory SET state='available' WHERE id=?", (d['item_id'],))
+                    db.execute("UPDATE rewards SET state='available', reservation=NULL WHERE reservation=? AND state='held'", (order_id,))
             elif action == 'edit':
                 require(order['status'] in ['Submitted', 'Reserved'] and not d.get('shipment_id'), 'Editing closes when processing or shipping begins.')
                 d['notes'] = str(data.get('notes', '')).strip()[:1000]
@@ -331,21 +345,35 @@ class Handler(SimpleHTTPRequestHandler):
                     require(order['status'] != 'Ready for student', 'A student must reserve and collect the computer to complete this donation.')
                     order['status'] = STAGES[STAGES.index(order['status']) + 1]
                     if order['status'] == 'Ready for student':
+                        listings = data.get('listings', [{} for _ in d['devices']])
+                        require(isinstance(listings, list) and len(listings) == len(d['devices']), 'Add listing details for each device.')
                         for i, device in enumerate(d['devices']):
+                            listing = listings[i]
+                            require(isinstance(listing, dict), 'Check the listing details.')
+                            price = listing.get('price', 0)
+                            require(type(price) is int and 0 <= price <= 500, 'Enter a whole-dollar student price from $0 to $500.')
+                            specs = str(listing.get('specs', '')).strip()[:300] or device['type'] + ' · Refurbished · Inspected and data wiped'
                             db.execute('INSERT OR IGNORE INTO inventory VALUES (?,?,?,?,?,?)',
-                                       (order_id + '-' + str(i), device['model'], device['type'] + ' · Refurbished · Inspected and data wiped', 0, order_id, 'available'))
+                                       (order_id + '-' + str(i), device['model'], specs, price, order_id, 'available'))
                 else:
                     order['status'] = 'Collected'
+                    db.execute("UPDATE rewards SET state='used' WHERE reservation=? AND state='held'", (order_id,))
                     db.execute("UPDATE inventory SET state='collected' WHERE id=?", (d['item_id'],))
                     item = db.execute('SELECT * FROM inventory WHERE id=?', (d['item_id'],)).fetchone()
                     donor = db.execute('SELECT * FROM orders WHERE id=?', (item['source'],)).fetchone()
                     if donor:
                         donor = unpack(donor)
                         donor['data']['points'] = donor['data'].get('points', 0) + 100
+                        code = uid('THANKS')
+                        choice = donor['data'].get('reward_choice', 'keep')
+                        db.execute('INSERT OR IGNORE INTO rewards VALUES (?,?,?,?,?,?,?,?)',
+                                   (code, donor['email'], choice, 20, 'available', d['item_id'], None, time.time()))
+                        reward_notice = (donor['email'], 'Your ByteBack thank-you is ready',
+                                         f"{'Demo reward — testing only. ' if DEMO else ''}A student collected your {item['name']}. Thank you for passing it along.\n\nYour reward code: {code}\nUp to $20 off one ByteBack computer. {'Share this code with a friend.' if choice == 'gift' else 'Use it from your donor account.'} No cash value; unused value is not carried over.\n\n{ORIGIN}/app.html#orders")
                         remaining = db.execute("SELECT count(*) FROM inventory WHERE source=? AND state!='collected'", (donor['id'],)).fetchone()[0]
                         if not remaining:
                             donor['status'] = 'Collected'
-                        history(donor, 'A student collected a device · 100 community points earned')
+                        history(donor, 'A student collected a device · Your $20 ByteBack thank-you is ready')
                         save_order(db, donor)
                 history(order, order['status'])
             elif action == 'label':
@@ -392,6 +420,8 @@ class Handler(SimpleHTTPRequestHandler):
             email_status = mail(order['email'], 'ByteBack ' + action + ' · ' + order_id, receipt(order))
         else:
             email_status = None
+        if reward_notice:
+            mail(*reward_notice)
         return {'order': order, 'email_status': email_status}
 
     def create_order(self, user, data):
@@ -406,6 +436,7 @@ class Handler(SimpleHTTPRequestHandler):
             if existing:
                 return {'order': unpack(existing), 'email_status': 'already created'}
             d = {'notes': str(data.get('notes', ''))[:1000], 'history': [], 'points': 0}
+            order_id = uid('BB')
             if kind == 'donation':
                 devices = data.get('devices')
                 require(isinstance(devices, list) and 1 <= len(devices) <= 10, 'Add between 1 and 10 devices.')
@@ -420,6 +451,10 @@ class Handler(SimpleHTTPRequestHandler):
                 method = data.get('method')
                 require(method in ['dropoff', 'shipping'], 'Select a delivery method.')
                 d.update({'devices': clean, 'method': method, 'pledge': True, 'pass': uid('DROP')})
+                choice = data.get('reward_choice', 'keep')
+                require(choice in ['keep', 'gift'], 'Choose whether to keep or give your thank-you reward.')
+                d.update({'reward_choice': choice, 'first_name': str(data.get('first_name', '')).strip()[:40],
+                          'student_note': str(data.get('student_note', '')).strip()[:240]})
                 if method == 'shipping':
                     d['address'] = valid_address(data.get('address'))
                     parcel = data.get('parcel', {})
@@ -432,9 +467,17 @@ class Handler(SimpleHTTPRequestHandler):
                 require(item['source'] not in [r[0] for r in db.execute('SELECT id FROM orders WHERE email=?', (user['email'],))], 'Choose a computer donated by someone else.')
                 require(data.get('student') is True, 'Confirm you are a Provo-area college student.')
                 d.update({'item_id': item['id'], 'item_name': item['name'], 'price': item['price'], 'pass': uid('PICK'), 'method': 'Campus pickup'})
+                code = str(data.get('reward_code', '')).strip().upper()
+                if code:
+                    reward = db.execute("SELECT * FROM rewards WHERE code=? AND state='available'", (code,)).fetchone()
+                    require(reward and (reward['email'] == user['email'] if reward['choice'] == 'keep' else reward['email'] != user['email']), 'This reward code is not available for this account.')
+                    require(item['price'] > 0, 'This computer is already free. Save your reward for a priced computer.')
+                    discount = min(reward['amount'], item['price'])
+                    d.update({'discount': discount, 'original_price': item['price'], 'price': item['price'] - discount, 'reward_code': code})
+                    db.execute("UPDATE rewards SET state='held', reservation=? WHERE code=?", (order_id, code))
                 db.execute("UPDATE inventory SET state='reserved' WHERE id=?", (item['id'],))
                 status = 'Reserved'
-            order = {'id': uid('BB'), 'email': user['email'], 'kind': kind, 'status': status, 'data': d, 'created': time.time()}
+            order = {'id': order_id, 'email': user['email'], 'kind': kind, 'status': status, 'data': d, 'created': time.time()}
             history(order, status)
             db.execute('INSERT INTO orders VALUES (?,?,?,?,?,?,?)', (order['id'], user['email'], kind, status, json.dumps(d), order['created'], key))
         return {'order': order, 'email_status': mail(user['email'], 'ByteBack receipt · ' + order['id'], receipt(order))}

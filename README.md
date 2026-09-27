@@ -1,6 +1,6 @@
 # BYU ByteBack — functional MVP
 
-Turn community tech waste into educational opportunity for Provo-area college students. The original landing page now links to a working donation and computer reservation app.
+Turn community tech waste into educational opportunity for Provo-area college students. A welcoming homepage and a guided four-step app connect donors and students. The design uses warm paper colors, clear next steps, and personal notes from the donor to the next student.
 
 **Independent academic project; not affiliated with, sponsored by, or endorsed by Brigham Young University.**
 
@@ -34,20 +34,21 @@ The full app needs `server.py`. Live Server, `python -m http.server`, opening an
 - **Management:** saved orders, edit notes/address before processing, cancel eligible orders, QR drop-off/pickup passes, printable summaries, unique receipts, and share prompts.
 - **Email:** automatic order/action receipts in a test inbox; STARTTLS SMTP delivery when live mode is configured. Failed delivery is visible and can be retried.
 - **Student flow:** searchable/sortable refurbished computer catalog, student eligibility acknowledgement, reservation, pickup pass, cancellation/restocking, and organizer-confirmed collection. Listed prices are due at pickup; no online payment processing.
-- **Donor incentive:** 100 community recognition points per donated device collected by a student. No cash value. Points are never awarded merely for creating an order, and donors cannot reserve their own devices.
-- **Organizer workflow:** configured organizer accounts can advance verified processing stages. A donation reaching “Ready for student” adds its devices to the catalog. New donated devices are listed free in this MVP; sample demo inventory illustrates paid options. All devices in a donation must be collected before the donation is complete.
+- **Custom donor reward:** choose a personal $20 ByteBack credit or a $20 code to give to a friend. One code is issued per collected device, never just for submitting a donation. Personal codes work only for the donor; gift codes work for another student. Codes apply up to $20 to a priced reservation, have no cash value or remaining balance, are held during reservation, restored on cancellation, and used on collection. Demo credits are explicitly labeled.
+- **Personal touches:** optional first name and a note to the next student, with an explicit notice that these appear in the catalog. Donors receive a named welcome and a reward email after collection. No fabricated testimonials or campus partnerships.
+- **Organizer workflow:** configured organizer accounts can advance verified processing stages. A donation reaching “Ready for student” adds its devices to the catalog. Before publishing, the organizer enters verified specifications and a whole-dollar pickup price from $0 to $500; $0 makes the device free. Legacy API callers without listing details retain the free default. All devices in a donation must be collected before the donation is complete.
 
-Donation selection is saved in localStorage; addresses and login tokens are not. Submitted orders, sessions, inventory, and receipt copies are stored server-side in SQLite under `.data/`. Restarting the server preserves them. No account data or credentials are committed to Git or exposed by the static file server.
+Device selection and reward preference are saved in localStorage; addresses and login tokens are not. The current step, return address, and optional personal note are kept in this tab’s sessionStorage so a refresh does not erase an unfinished donation. The draft resets after successful submission. Submitted orders, sessions, inventory, rewards, and receipt copies are stored server-side in SQLite under `.data/`. Restarting the server preserves them. No account data or credentials are committed to Git or exposed by the static file server.
 
 ## A five-minute classroom walkthrough
 
 1. Open **Donate a device**. Add a fictional laptop, confirm its battery is safe, and continue.
 2. Choose drop-off or shipping. For shipping, enter a fictional US address and package measurements.
-3. Review, accept the data-wipe pledge, and sign in with a fictional email address. Click **Open demo sign-in link** in the dialog, then confirm the donation.
-4. View its QR pass or generate/print a **test** shipping label. Open **My dashboard** to see the automatic receipt in **Test email inbox**. Reload to demonstrate persistence.
-5. Use **Test: advance to …** to simulate receiving, verified erasure, refurbishment, and catalog availability. These controls are intentionally visible only in local demo mode; live status changes require an organizer account.
+3. Choose whether to keep your $20 thank-you or give it to a friend. Optionally add your first name and a note to the next student. Review, accept the data-wipe pledge, and sign in with a fictional email address. Click **Open demo sign-in link** in the dialog, then confirm the donation.
+4. View its QR pass or generate/print a **test** shipping label. Open **My ByteBack**, then expand **Email & receipts** to see the automatic receipt. Reload to demonstrate persistence.
+5. Expand **Classroom demo controls** to simulate receiving, verified erasure, and refurbishment. At the final step, add verified specifications and a pickup price, then publish to the catalog. These controls are intentionally visible only in local demo mode; live status changes require an organizer account.
 6. Sign out and sign in with a second fictional email. Open **Find a computer**, locate the donated model, and reserve it. Confirm collection with the test control.
-7. Sign back into the donor account. The collected donation now shows 100 community points. A second browser context can demonstrate dashboard polling.
+7. Sign back into the donor account. The collected donation now shows a $20 reward code under **Your rewards**. Try it on a priced reservation from the donor account for a personal code, or from a different account for a gift code. A second browser context can demonstrate dashboard polling.
 8. To test cancellation, reserve another device and cancel before collection; it returns to the catalog. To test email retries, use **Resend receipt**.
 
 **Demo mode is local-only, binds to 127.0.0.1, and never sends external email or buys postage.** The demo sign-in link is visible to the person requesting it, so fictional email addresses are not verified identities in this mode. Do not expose the demo server publicly or enter sensitive personal information. No real drop-off location, available hardware, partner reward, physical data wipe, or refurbishment service is claimed.
@@ -75,13 +76,13 @@ python3 -m unittest discover -s tests -v
 node --check app.js
 ```
 
-Tests cover single-use authentication, unauthorized access, CSRF, origin validation, private-file protection, invalid donations/addresses, idempotent submissions, competing reservations, cancellation/restocking, order editing, mock labels and receipts, live role enforcement, and the full donation → catalog → reservation → collection → donor-points lifecycle. Tests use a temporary database and never alter your app data.
+Tests cover single-use authentication, unauthorized access, CSRF, origin validation, private-file protection, invalid donations/addresses, idempotent submissions, competing reservations, cancellation/restocking, order editing, mock labels and receipts, live role enforcement, and the full donation → catalog → reservation → collection → donor-reward lifecycle, personal/gift-code access, discount application, cancellation restoration, and organizer pricing. Tests use a temporary database and never alter your app data.
 
 Browser checks exercised donation, sign-in, reservation, cancellation, reload persistence, QR rendering, and screen widths of 320, 375, 768, and 1440 pixels. Checked donation and dashboard screens had no automated WCAG 2 A/AA or WCAG 2.1 AA violations. Automated checks do not constitute accessibility certification.
 
 ## Files
 
-- `index.html`, `styles.css`, `script.js`: original responsive landing page and local-only contact interest form.
+- `index.html`, `brand.css`: redesigned responsive homepage and shared visual system. `styles.css` and `script.js` are retained legacy assets; the new homepage does not load them.
 - `app.html`, `app.css`, `app.js`: functional app, donation wizard, catalog, dashboard, dialogs, and print layouts.
 - `server.py`: dependency-free HTTP backend, SQLite persistence, authentication, SMTP, and EasyPost adapter.
 - `.env.example`: local/live configuration template.

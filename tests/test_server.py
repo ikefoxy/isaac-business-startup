@@ -66,7 +66,7 @@ class MVPTests(unittest.TestCase):
 
     def setUp(self):
         with server.connect() as db:
-            for table in ['orders', 'sessions', 'messages', 'links', 'throttles', 'inventory']:
+            for table in ['orders', 'sessions', 'messages', 'links', 'throttles', 'inventory', 'rewards']:
                 db.execute('DELETE FROM ' + table)
         server.init_db()
         self.alice = Client(self.port)
@@ -169,6 +169,56 @@ class MVPTests(unittest.TestCase):
             status, result = self.donation()
         self.assertEqual((status, result['email_status']), (200, 'failed'))
         self.assertEqual(self.alice.request('GET','/api/orders')[1]['orders'][0]['id'],result['order']['id'])
+
+    def earn_reward(self, choice='keep'):
+        _, result = self.donation(reward_choice=choice, first_name='Alex', student_note='Good luck this semester!')
+        order_id = result['order']['id']
+        for _ in range(4):
+            self.assertEqual(self.alice.request('POST', '/api/orders/'+order_id+'/advance', {})[0], 200)
+        item = next(i for i in self.bob.request('GET','/api/catalog')[1]['items'] if i['source']==order_id)
+        self.assertEqual(item['donor_name'], 'Alex')
+        self.assertEqual(item['student_note'], 'Good luck this semester!')
+        self.assertEqual(self.alice.request('GET','/api/rewards')[1]['rewards'], [])
+        _, result = self.bob.request('POST','/api/orders', {'kind':'reservation','request_key':'earn-reward-1234','item_id':item['id'],'student':True})
+        self.assertEqual(self.bob.request('POST','/api/orders/'+result['order']['id']+'/advance',{})[0],200)
+        self.assertEqual(self.bob.request('GET','/api/rewards')[1]['rewards'], [])
+        rewards = self.alice.request('GET','/api/rewards')[1]['rewards']
+        self.assertEqual(len(rewards),1)
+        self.assertEqual(rewards[0]['amount'],20)
+        return rewards[0]['code']
+
+    def test_personal_reward_is_private_single_use_and_restored_on_cancel(self):
+        code = self.earn_reward()
+        payload = {'kind':'reservation','request_key':'use-reward-1234','item_id':'demo-dell','student':True,'reward_code':code}
+        self.assertEqual(self.bob.request('POST','/api/orders',payload)[0],400)
+        status,result = self.alice.request('POST','/api/orders',payload)
+        self.assertEqual((status,result['order']['data']['price']), (200,99))
+        self.assertEqual(result['order']['data']['discount'],20)
+        self.assertEqual(self.alice.request('POST','/api/orders',{**payload,'request_key':'double-reward-123','item_id':'demo-ipad'})[0],400)
+        self.assertEqual(self.alice.request('POST','/api/orders/'+result['order']['id']+'/cancel',{})[0],200)
+        status,result = self.alice.request('POST','/api/orders',{**payload,'request_key':'retry-reward-1234'})
+        self.assertEqual(status,200)
+        self.assertEqual(self.alice.request('POST','/api/orders/'+result['order']['id']+'/advance',{})[0],200)
+        self.assertEqual(self.alice.request('GET','/api/rewards')[1]['rewards'][0]['state'],'used')
+
+    def test_gift_reward_can_be_used_by_friend_but_not_donor(self):
+        code = self.earn_reward('gift')
+        payload = {'kind':'reservation','request_key':'gift-reward-1234','item_id':'demo-ipad','student':True,'reward_code':code}
+        self.assertEqual(self.alice.request('POST','/api/orders',payload)[0],400)
+        status,result = self.bob.request('POST','/api/orders',payload)
+        self.assertEqual((status,result['order']['data']['price']), (200,39))
+        self.assertEqual(self.alice.request('GET','/api/rewards')[1]['rewards'][0]['state'],'held')
+
+    def test_organizer_listing_price_and_specifications(self):
+        _, result = self.donation()
+        path = '/api/orders/'+result['order']['id']+'/advance'
+        for _ in range(3):
+            self.assertEqual(self.alice.request('POST',path,{})[0],200)
+        self.assertEqual(self.alice.request('POST',path,{'listings':[{'price':-20}]})[0],400)
+        self.assertEqual(self.alice.request('POST',path,{'listings':[{'price':79,'specs':'8 GB RAM · 256 GB SSD · Linux Mint'}]})[0],200)
+        item=next(i for i in self.bob.request('GET','/api/catalog')[1]['items'] if i['source']==result['order']['id'])
+        self.assertEqual(item['price'],79)
+        self.assertEqual(item['specs'],'8 GB RAM · 256 GB SSD · Linux Mint')
 
     def test_carrier_purchase_timeout_reuses_shipment(self):
         address = {'name':'Alice','street1':'123 Test Lane','city':'Provo','state':'UT','zip':'84601'}
