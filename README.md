@@ -1,84 +1,92 @@
-# BYU ByteBack
+# BYU ByteBack — functional MVP
 
-**Independent academic project. BYU ByteBack is not affiliated with, sponsored by, or endorsed by Brigham Young University.**
+Turn community tech waste into educational opportunity for Provo-area college students. The original landing page now links to a working donation and computer reservation app.
 
-A responsive, single-page landing site for a proposed student initiative that gives unused technology a second life. Built with plain HTML, CSS, and JavaScript. No framework, build process, backend, or external runtime services are required.
+**Independent academic project; not affiliated with, sponsored by, or endorsed by Brigham Young University.**
 
-## Get a local copy
+## Run it
 
-Anyone with the project files can run the site on their own computer. On GitHub, choose **Code → Download ZIP** and extract the folder, or clone it:
-
-```sh
-git clone https://github.com/ikefoxy/isaac-business-startup.git
-cd isaac-business-startup
-```
-
-Open the folder containing `index.html` in VS Code. No `npm install`, account, API key, or build step is needed.
-
-## Run on localhost in VS Code
-
-With **Python 3** installed:
-
-1. Choose **Terminal → Run Task**.
-2. Select **Preview BYU ByteBack on localhost**.
-3. Open **http://localhost:4173/** in your browser.
-
-The included task uses `python3` on macOS/Linux and `py` on Windows. Keep its terminal running while viewing the site. Press **Ctrl+C** in that terminal to stop the server.
-
-If you already use the **Live Server** extension, you can instead right-click `index.html` and choose **Open with Live Server**; use the local address it opens.
-
-## Run on localhost from a terminal
-
-From the folder containing `index.html`, run one of these commands.
-
-**macOS / Linux:**
+Requires Python 3.10+ and a modern browser. No package installation or build step is required.
 
 ```sh
-python3 -m http.server 4173 --bind 127.0.0.1
+python3 server.py
 ```
 
-**Windows:**
+On Windows, use `py server.py`. Open **http://localhost:4173/app.html** for the app or **http://localhost:4173/** for the landing page. VS Code's **Terminal → Run Task → Preview BYU ByteBack on localhost** runs the same server.
+
+If port 4173 is already occupied, use another port:
 
 ```sh
-py -m http.server 4173 --bind 127.0.0.1
+PORT=4174 PUBLIC_URL=http://localhost:4174 python3 server.py
 ```
 
-Visit **http://localhost:4173/**. If port 4173 is already serving this project, use the running preview. Otherwise, replace `4173` with an unused port such as `4174` in both the command and browser address. If the Python command is unavailable, install Python 3 or use VS Code's Live Server option above.
+On Windows, set `PORT` and `PUBLIC_URL` in `.env` instead. Use the exact `PUBLIC_URL` hostname in your browser (localhost and 127.0.0.1 are different origins).
 
-`localhost` refers to the viewer's own computer. Sharing a localhost link does not share the website; each viewer needs a local copy and a running preview server. A public website would require a separate hosting step such as GitHub Pages.
+The full app needs `server.py`. Live Server, `python -m http.server`, opening an HTML file directly, and GitHub Pages can display the landing page but cannot run accounts, orders, or shipping. The app explains this if its backend is unavailable.
 
-You can also open `index.html` directly, though some browsers restrict local storage on `file://` pages. A local server provides the most reliable form preview. All fonts and artwork are included locally, so the site needs no internet connection once downloaded.
+## What works
 
-## Files
+- **Magic-link accounts:** 15-minute, single-use links; hashed tokens; 24-hour HttpOnly sessions; CSRF and same-origin checks; sign-out and per-account order access.
+- **Device selection:** visual laptop/desktop/tablet selector, condition checklist, charger option, battery-safety confirmation, 10-device basket, removal, data-wipe pledge, and estimated device-weight impact.
+- **Handoff:** drop-off or shipping selection, return-address format validation, package dimensions and weight, and optional notes. EasyPost verifies addresses before live label creation.
+- **Shipping labels:** printable mock labels in local demo mode; configurable EasyPost USPS/FedEx rating and label purchasing in live mode. An organizer-defined spending ceiling applies. Carrier test labels are identified as test postage.
+- **Tracking:** saved activity timeline with dashboard refresh every 15 seconds. Carrier data is retrieved at most once per minute per active shipment. Carrier transit status and organizer-verified refurbishment progress remain separate.
+- **Management:** saved orders, edit notes/address before processing, cancel eligible orders, QR drop-off/pickup passes, printable summaries, unique receipts, and share prompts.
+- **Email:** automatic order/action receipts in a test inbox; STARTTLS SMTP delivery when live mode is configured. Failed delivery is visible and can be retried.
+- **Student flow:** searchable/sortable refurbished computer catalog, student eligibility acknowledgement, reservation, pickup pass, cancellation/restocking, and organizer-confirmed collection. Listed prices are due at pickup; no online payment processing.
+- **Donor incentive:** 100 community recognition points per donated device collected by a student. No cash value. Points are never awarded merely for creating an order, and donors cannot reserve their own devices.
+- **Organizer workflow:** configured organizer accounts can advance verified processing stages. A donation reaching “Ready for student” adds its devices to the catalog. New donated devices are listed free in this MVP; sample demo inventory illustrates paid options. All devices in a donation must be collected before the donation is complete.
 
-- `index.html` — Semantic page sections, navigation, form, FAQ, and search/social metadata.
-- `styles.css` — Responsive layouts, visual treatments, reduced-motion support, and focus states.
-- `script.js` — Mobile navigation, CTA interest selection, accessible form validation, local request storage, and scroll reveals.
-- `.vscode/tasks.json` — Ready-to-run localhost preview task for VS Code.
-- `assets/second-life.svg` — Original laptop and circular-economy illustration.
-- `assets/favicon.svg` — Original circular-arrow brand mark.
-- `assets/social-card.svg` — Editable social preview artwork.
-- `assets/social-card.png` — Social preview image compatible with sharing services.
-- `assets/manrope-variable.ttf` and `assets/FONT-LICENSE.txt` — Self-hosted Manrope font and its SIL Open Font License.
+Donation selection is saved in localStorage; addresses and login tokens are not. Submitted orders, sessions, inventory, and receipt copies are stored server-side in SQLite under `.data/`. Restarting the server preserves them. No account data or credentials are committed to Git or exposed by the static file server.
 
-## Form behavior
+## A five-minute classroom walkthrough
 
-The form requires a name, email, interest, and message. Organization is optional. Donation and partner buttons select the corresponding interest automatically. A successful submission saves the latest request in this browser's `localStorage` under `byu-byteback-prototype-request`, replacing the previous prototype request.
+1. Open **Donate a device**. Add a fictional laptop, confirm its battery is safe, and continue.
+2. Choose drop-off or shipping. For shipping, enter a fictional US address and package measurements.
+3. Review, accept the data-wipe pledge, and sign in with a fictional email address. Click **Open demo sign-in link** in the dialog, then confirm the donation.
+4. View its QR pass or generate/print a **test** shipping label. Open **My dashboard** to see the automatic receipt in **Test email inbox**. Reload to demonstrate persistence.
+5. Use **Test: advance to …** to simulate receiving, verified erasure, refurbishment, and catalog availability. These controls are intentionally visible only in local demo mode; live status changes require an organizer account.
+6. Sign out and sign in with a second fictional email. Open **Find a computer**, locate the donated model, and reserve it. Confirm collection with the test control.
+7. Sign back into the donor account. The collected donation now shows 100 community points. A second browser context can demonstrate dashboard polling.
+8. To test cancellation, reserve another device and cancel before collection; it returns to the catalog. To test email retries, use **Resend receipt**.
 
-**No information is transmitted and no follow-up is promised.** The confirmation explicitly explains this and lets the visitor delete the saved request or start another. If local storage is unavailable, the page shows an error instead of claiming success. JavaScript must be enabled to submit; all page content and FAQ answers remain available without it.
+**Demo mode is local-only, binds to 127.0.0.1, and never sends external email or buys postage.** The demo sign-in link is visible to the person requesting it, so fictional email addresses are not verified identities in this mode. Do not expose the demo server publicly or enter sensitive personal information. No real drop-off location, available hardware, partner reward, physical data wipe, or refurbishment service is claimed.
 
-## GitHub Pages readiness
+## Connect real services
 
-All runtime files and links are relative, so the site can be hosted at a GitHub Pages repository URL without a build step.
+Copy `.env.example` to `.env` and fill the commented settings. Do not put secrets in frontend JavaScript or commit `.env`.
 
-When publication is authorized, GitHub Pages can serve these files from the repository root. Set the social image metadata to the final absolute public URL (for example, `https://ikefoxy.github.io/isaac-business-startup/assets/social-card.png`) and add `og:url` after confirming the deployment URL. The proposed domain **byubyteback.org** is displayed as a proposal; there is no `CNAME` file or claim that the domain is registered or active.
+For real email and account ownership verification, set `BYTEBACK_MODE=live`, an HTTPS `PUBLIC_URL`, the SMTP host/user/password/from address, `ADMIN_EMAILS`, and a confirmed `DROPOFF_DESCRIPTION`. Live startup requires these settings. SMTP uses port 587 with STARTTLS by default. Run behind an HTTPS reverse proxy; the bundled HTTP server is a small local/pilot implementation, not a production hosting platform.
+
+Use a **separate `BYTEBACK_DB`** for live operation so test orders and identities are not carried over. Sample inventory is only seeded and shown in demo mode. Real inventory is created through organizer-verified donations. Log in as an email listed in `ADMIN_EMAILS` to access **Organizer workspace**.
+
+For postage, configure `EASYPOST_API_KEY`, a real receiving address in `SHIP_TO_JSON`, and `MAX_LABEL_USD`. Use an EasyPost test key first; production keys spend real money from the organizer’s shipping account. Shipping remains disabled without a key. The app verifies the sender address, obtains USPS/FedEx rates, selects the lowest USD rate within the limit, and stores the shipment ID before purchasing. Retrying an interrupted request retrieves the existing shipment rather than creating another. Once a carrier shipment exists, editing/cancellation requires organizer handling outside the app; carrier refunds/voiding are not implemented.
+
+Integration reference: [EasyPost shipments](https://docs.easypost.com/docs/shipments), [carrier trackers](https://docs.easypost.com/docs/trackers). Carrier events are polled rather than delivered through webhooks. No paid postage or real SMTP delivery was exercised during local verification; those require service credentials and a sandbox acceptance test.
+
+Email receipts acknowledge orders, not charitable contributions. Tax-deduction receipts, SMS, campus maps, cash payouts, payment collection, courier pickup, partial-batch rejection/recycling, and shipping refund administration are outside this MVP. There are no invented tax valuations or campus partnerships. Inventory reservations persist until collection or cancellation; automatic expiry is not implemented.
 
 ## Verification
 
-Verified in Chrome at ten viewport widths from 320 to 1920 pixels with no horizontal page overflow. Browser checks covered navigation targets, mobile menu and keyboard controls, FAQ expansion, CTA interest selection, form validation, local saving and deletion, reload persistence, unavailable local storage, reduced motion, and use without JavaScript. Form submission triggered no network requests. No console errors or missing assets were found.
+Run the independent HTTP/SQLite tests:
 
-Automated axe checks reported no WCAG 2 A/AA or WCAG 2.1 AA violations on the checked desktop and mobile states. HTML structural validation and JavaScript syntax checks also passed. These automated checks supplement a visual review; they are not a claim of full accessibility certification.
+```sh
+python3 -m unittest discover -s tests -v
+node --check app.js
+```
 
-## Project status
+Tests cover single-use authentication, unauthorized access, CSRF, origin validation, private-file protection, invalid donations/addresses, idempotent submissions, competing reservations, cancellation/restocking, order editing, mock labels and receipts, live role enforcement, and the full donation → catalog → reservation → collection → donor-points lifecycle. Tests use a temporary database and never alter your app data.
 
-BYU ByteBack is a proposed student project created for an academic assignment. It is not affiliated with, sponsored by, or endorsed by Brigham Young University. Device collection, data erasure, refurbishment, distribution, and recycling describe the intended business model; this prototype does not operate those services or claim achieved impact.
+Browser checks exercised donation, sign-in, reservation, cancellation, reload persistence, QR rendering, and screen widths of 320, 375, 768, and 1440 pixels. Checked donation and dashboard screens had no automated WCAG 2 A/AA or WCAG 2.1 AA violations. Automated checks do not constitute accessibility certification.
+
+## Files
+
+- `index.html`, `styles.css`, `script.js`: original responsive landing page and local-only contact interest form.
+- `app.html`, `app.css`, `app.js`: functional app, donation wizard, catalog, dashboard, dialogs, and print layouts.
+- `server.py`: dependency-free HTTP backend, SQLite persistence, authentication, SMTP, and EasyPost adapter.
+- `.env.example`: local/live configuration template.
+- `tests/test_server.py`: isolated backend integration tests.
+- `qr.js`: vendored qrcode-generator 1.4.4, MIT licensed (see `assets/QR-LICENSE.txt`). QR codes contain the pass identifier only, never account credentials.
+- `assets/`: original artwork, favicon, social card, self-hosted Manrope font and licenses.
+
+Keep `.data/` backed up if preserving pilot orders. To reset a disposable local demo, stop the server, move `.data/byteback.sqlite3` and any matching WAL/SHM files aside, and restart. Use a new `BYTEBACK_DB` path for a fresh test without deleting anything.

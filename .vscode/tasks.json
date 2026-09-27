@@ -8,7 +8,7 @@
       "windows": {
         "command": "py"
       },
-      "args": ["-m", "http.server", "4173", "--bind", "127.0.0.1"],
+      "args": ["server.py"],
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -22,7 +22,7 @@
       "runOptions": {
         "instanceLimit": 1
       },
-      "detail": "Requires Python 3. Open http://localhost:4173/ in your browser. Stop the server with Ctrl+C in the task terminal."
+      "detail": "Runs the functional MVP with accounts and saved orders. Open http://localhost:4173/app.html. Requires Python 3. Stop with Ctrl+C."
     }
   ]
 }

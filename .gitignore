@@ -427,3 +427,10 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# ByteBack local credentials, account data, and test artifacts
+.env
+.data/
+__pycache__/
+*.pyc
+test-results/
