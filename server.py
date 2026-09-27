@@ -20,6 +20,7 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlsplit
 
 ROOT = Path(__file__).resolve().parent
+DEMO_CATALOG = {p['id']: p for p in json.loads((ROOT / 'catalog-data.json').read_text())}
 # Small, dependency-free .env reader. Environment variables take precedence.
 if (ROOT / '.env').exists():
     for line in (ROOT / '.env').read_text().splitlines():
@@ -61,10 +62,9 @@ def init_db():
         CREATE TABLE IF NOT EXISTS rewards (code TEXT PRIMARY KEY, email TEXT, choice TEXT, amount INTEGER, state TEXT, source TEXT UNIQUE, reservation TEXT, created REAL);
         ''')
         if DEMO:
-            for item in [('demo-thinkpad', 'Lenovo ThinkPad T480', 'Core i5 · 8 GB RAM · 256 GB SSD · Linux Mint', 79),
-                         ('demo-dell', 'Dell Latitude 5400', 'Core i5 · 16 GB RAM · 256 GB SSD · Linux Mint', 119),
-                         ('demo-ipad', 'Apple iPad (7th generation)', '32 GB · Wi-Fi · 10.2-inch display', 59)]:
-                db.execute('INSERT OR IGNORE INTO inventory VALUES (?,?,?,?,?,?)', (*item, 'Demo inventory', 'available'))
+            for item in DEMO_CATALOG.values():
+                db.execute('INSERT INTO inventory VALUES (?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET name=excluded.name,specs=excluded.specs,price=excluded.price',
+                           (item['id'], item['name'], item['specs'], item['price'], 'Demo inventory', 'available'))
 
 
 def digest(value):
@@ -216,7 +216,7 @@ class Handler(SimpleHTTPRequestHandler):
         path = urlsplit(self.path).path
         if path.startswith('/api/'):
             return self.dispatch('GET', path)
-        allowed = {'/', '/index.html', '/app.html', '/styles.css', '/brand.css', '/script.js', '/app.css', '/app.js', '/qr.js'}
+        allowed = {'/', '/index.html', '/app.html', '/styles.css', '/brand.css', '/store.css', '/store.js', '/shop.js', '/catalog-data.json', '/image-credits.html', '/script.js', '/app.css', '/app.js', '/qr.js'}
         # Explicit allowlist: never serve .env, SQLite, source files, or .git.
         if path not in allowed and path not in {'/assets/' + p.name for p in (ROOT / 'assets').iterdir() if p.is_file()}:
             return self.send_error(404)
@@ -224,7 +224,7 @@ class Handler(SimpleHTTPRequestHandler):
 
     def do_HEAD(self):
         path = urlsplit(self.path).path
-        allowed = {'/', '/index.html', '/app.html', '/styles.css', '/brand.css', '/script.js', '/app.css', '/app.js', '/qr.js'}
+        allowed = {'/', '/index.html', '/app.html', '/styles.css', '/brand.css', '/store.css', '/store.js', '/shop.js', '/catalog-data.json', '/image-credits.html', '/script.js', '/app.css', '/app.js', '/qr.js'}
         if path not in allowed and path not in {'/assets/' + p.name for p in (ROOT / 'assets').iterdir() if p.is_file()}:
             return self.send_error(404)
         super().do_HEAD()
@@ -259,6 +259,20 @@ class Handler(SimpleHTTPRequestHandler):
             with connect() as db:
                 items = [dict(r) for r in db.execute("SELECT * FROM inventory WHERE state='available' AND (? OR id NOT LIKE 'demo-%')", (DEMO,))]
                 for item in items:
+                    if item['id'] in DEMO_CATALOG:
+                        item.update({k: v for k, v in DEMO_CATALOG[item['id']].items() if k not in ['id', 'price', 'name', 'specs']})
+                    else:
+                        # Only infer attributes explicitly present in the verified listing.
+                        text = (item['name'] + ' ' + item['specs']).lower()
+                        item['brand'] = next((b for b in ['Apple','Dell','Lenovo','HP','ASUS','Acer','Microsoft'] if re.search(r'\b'+b.lower()+r'\b', text)), 'Other')
+                        if 'thinkpad' in text:
+                            item['brand'] = 'Lenovo'
+                        item['os'] = next((label for label, terms in [('macOS',['macos']),('Windows',['windows']),('Linux',['linux','ubuntu','mint']),('iPadOS',['ipados'])] if any(t in text for t in terms)), '')
+                        item['cpu'] = next((label for label, terms in [('AMD',['ryzen','amd cpu']),('Intel',['intel','core i']),('Apple silicon',['apple m1','apple m2','apple m3','apple m4'])] if any(t in text for t in terms)), '')
+                        item['gpu'] = next((label for label, terms in [('NVIDIA',['nvidia','geforce','rtx']),('AMD',['radeon']),('Intel',['intel graphics','intel uhd','iris']),('Apple',['apple gpu'])] if any(t in text for t in terms)), '')
+                        ram = re.search(r'(\d+)\s*gb\s*ram', text)
+                        item['ram'] = int(ram.group(1)) if ram else 0
+                        item['photo'] = ''
                     donor = db.execute('SELECT data FROM orders WHERE id=?', (item['source'],)).fetchone()
                     if donor:
                         d = json.loads(donor['data'])

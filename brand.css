@@ -7,13 +7,13 @@
 
 :root {
   color-scheme:light;
-  --background:#f6f5f0;
-  --surface:#fffefa;
-  --surface-raised:#eeeee6;
-  --text:#213b39;
-  --muted:#626d67;
-  --accent:#28634e;
-  --line:#dcded4;
+  --background:#f0f3f6;
+  --surface:#fafcff;
+  --surface-raised:#e6e9ee;
+  --text:#212c3b;
+  --muted:#586577;
+  --accent:#284263;
+  --line:#d3d8df;
   --radius:14px;
   --font:Manrope,Arial,sans-serif
 }
@@ -93,8 +93,8 @@ p {
 }
 
 ::selection {
-  background:#d4e6cb;
-  color:#183a2d
+  background:#cbd7e6;
+  color:#18273a
 }
 
 .page-width {
@@ -143,14 +143,14 @@ p {
   width:34px;
   height:36px;
   border-radius:10px;
-  background:#244b3e;
-  color:#f4f5da;
+  background:#24354b;
+  color:#dae6f5;
   font-size:29px;
   font-weight:500
 }
 
 .brand-dot {
-  color:#71915a
+  color:#5a7291
 }
 
 .app-header nav {
@@ -163,13 +163,13 @@ p {
 .app-header nav a {
   font-size:12px;
   font-weight:600;
-  color:#536059;
+  color:#4c5867;
   padding:12px 0
 }
 
 .app-header nav a:hover,.app-header nav a[aria-current=page] {
-  color:#25583e;
-  box-shadow:0 2px #668d55
+  color:#253b58;
+  box-shadow:0 2px #556d8d
 }
 
 .button {
@@ -179,10 +179,10 @@ p {
   gap:25px;
   min-height:50px;
   padding:14px 24px;
-  border:1px solid #244b3e;
+  border:1px solid #24354b;
   border-radius:7px;
-  background:#244b3e;
-  color:#fffefa;
+  background:#24354b;
+  color:#fafcff;
   font-weight:650;
   font-size:12px;
   text-decoration:none;
@@ -190,18 +190,18 @@ p {
 }
 
 .button:hover {
-  background:#183e2e;
+  background:#18283e;
   transform:translateY(-1px)
 }
 
 .button-outline {
   background:transparent;
-  border-color:#b3bcb0;
-  color:#244b3e
+  border-color:#abb5c1;
+  color:#24354b
 }
 
 .button-outline:hover {
-  background:#e9eddf
+  background:#dfe5ed
 }
 
 .button-small {
@@ -221,7 +221,7 @@ p {
   font-size:10px;
   letter-spacing:1.7px;
   font-weight:750;
-  color:#58674f;
+  color:#4d5969;
   line-height:1.7
 }
 
@@ -230,7 +230,7 @@ p {
   width:7px;
   height:7px;
   border-radius:50%;
-  background:#5b7b4b;
+  background:#4b607b;
   margin-right:7px
 }
 
@@ -245,8 +245,8 @@ p {
 .text-link {
   font-size:13px;
   font-weight:700;
-  color:#285c45;
-  border-bottom:1px solid #a9bb9f;
+  color:#283f5c;
+  border-bottom:1px solid #9fabbb;
   display:inline-block;
   padding:6px 0
 }
@@ -270,7 +270,7 @@ p {
 .home-hero h1 em {
   font-family:Georgia,serif;
   font-weight:400;
-  color:#56784b;
+  color:#4b5e78;
   font-size:1.04em;
   letter-spacing:-2.7px
 }
@@ -285,15 +285,15 @@ p {
   display:flex;
   gap:17px;
   font-size:10px;
-  color:#65715f;
+  color:#586678;
   margin-top:24px
 }
 
 .hero-scene {
   height:484px;
-  border:1px solid #daddcc;
+  border:1px solid #ccd3dd;
   border-radius:18px;
-  background:#e9ecdf;
+  background:#dfe5ec;
   position:relative;
   overflow:hidden
 }
@@ -306,7 +306,7 @@ p {
   font-size:8px;
   font-weight:700;
   letter-spacing:1.25px;
-  color:#58674f
+  color:#4d5969
 }
 
 .scene-bottom {
@@ -319,11 +319,11 @@ p {
   position:absolute;
   width:310px;
   height:310px;
-  border:1px solid #ccd5c2;
+  border:1px solid #c2cad5;
   border-radius:50%;
   top:82px;
   left:93px;
-  box-shadow:0 0 0 38px #e9ecdf,0 0 0 39px #d9dfcd
+  box-shadow:0 0 0 38px #dfe5ec,0 0 0 39px #cdd5df
 }
 
 .laptop-object {
@@ -335,10 +335,10 @@ p {
 }
 
 .laptop-lid {
-  background:#45534e;
+  background:#414a57;
   padding:9px 9px 13px;
   border-radius:12px 12px 4px 4px;
-  border:2px solid #7b8982;
+  border:2px solid #6f7f95;
   box-shadow:0 18px 30px #314b3a1a;
   width:86%;
   margin:auto
@@ -347,7 +347,7 @@ p {
 .laptop-camera {
   width:3px;
   height:3px;
-  background:#a7b4a4;
+  background:#a0aab8;
   border-radius:50%;
   position:absolute;
   top:5px;
@@ -356,7 +356,7 @@ p {
 
 .laptop-screen {
   aspect-ratio:1.6;
-  background:#f9f9ed;
+  background:#edf2f9;
   position:relative;
   overflow:hidden;
   padding:17px
@@ -364,7 +364,7 @@ p {
 
 .screen-mark {
   font-size:22px;
-  color:#355c45
+  color:#35465c
 }
 
 .screen-note {
@@ -373,7 +373,7 @@ p {
   text-align:center;
   font-size:25px;
   font-weight:600;
-  color:#345841;
+  color:#344458;
   margin-top:2px;
   letter-spacing:-1px
 }
@@ -397,7 +397,7 @@ p {
 .laptop-base {
   height:10px;
   border-radius:2px 2px 45% 45%;
-  background:linear-gradient(#b4bfb5,#6e7f70);
+  background:linear-gradient(#afb8c4,#657488);
   box-shadow:0 20px 25px #3b50332b;
   position:relative
 }
@@ -406,7 +406,7 @@ p {
   content:'';
   width:60px;
   height:4px;
-  background:#6c7e71;
+  background:#637387;
   position:absolute;
   left:43%;
   border-radius:0 0 6px 6px
@@ -419,8 +419,8 @@ p {
   display:flex;
   align-items:center;
   gap:10px;
-  background:#fffefa;
-  border:1px solid #d5ddcb;
+  background:#fafcff;
+  border:1px solid #cbd3dd;
   border-radius:9px;
   padding:13px 15px;
   transform:rotate(-3deg);
@@ -430,11 +430,11 @@ p {
 .tag-check {
   width:25px;
   height:25px;
-  border:1px solid #acbda2;
+  border:1px solid #a2aebd;
   border-radius:50%;
   display:grid;
   place-items:center;
-  color:#3e6b45
+  color:#3e526b
 }
 
 .device-tag strong {
@@ -445,7 +445,7 @@ p {
 .device-tag span:not(.tag-check) {
   font-size:7px;
   display:block;
-  color:#687263
+  color:#5b687a
 }
 
 .paper-note {
@@ -453,7 +453,7 @@ p {
   right:19px;
   top:62px;
   width:159px;
-  background:#f9e7b6;
+  background:#b6d3f9;
   padding:18px 15px;
   transform:rotate(8deg);
   box-shadow:2px 4px 9px #55522215
@@ -461,12 +461,12 @@ p {
 
 .paper-note>span {
   font-size:7px;
-  color:#58674f
+  color:#4d5969
 }
 
 .paper-note p {
   font:italic 23px/1.2 Georgia,serif;
-  color:#4a5337;
+  color:#374353;
   margin:10px 0
 }
 
@@ -478,7 +478,7 @@ p {
   border-block:1px solid var(--line);
   padding:19px 0;
   font-size:11px;
-  color:#58674f
+  color:#4d5969
 }
 
 .local-strip>div {
@@ -514,7 +514,7 @@ p {
   gap:0;
   border:1px solid var(--line);
   border-radius:12px;
-  background:#fffefa;
+  background:#fafcff;
   overflow:hidden
 }
 
@@ -530,7 +530,7 @@ p {
 
 .process-number {
   font:italic 28px Georgia,serif;
-  color:#778967;
+  color:#66768a;
   margin-bottom:28px
 }
 
@@ -548,7 +548,7 @@ p {
   margin-top:auto;
   font-size:7px;
   letter-spacing:1px;
-  color:#58674f;
+  color:#4d5969;
   font-weight:700
 }
 
@@ -559,8 +559,8 @@ p {
 }
 
 .reward-section {
-  background:#e9eddf;
-  border-block:1px solid #d9dfce;
+  background:#dfe5ed;
+  border-block:1px solid #ced5df;
   padding:65px 0
 }
 
@@ -587,9 +587,9 @@ p {
 
 .reward-paper {
   max-width:430px;
-  background:#fffbed;
+  background:#edf5ff;
   transform:rotate(-3deg);
-  border:1px solid #ccd2bd;
+  border:1px solid #bdc6d2;
   box-shadow:0 15px 28px #3e543516;
   padding:27px 32px;
   position:relative
@@ -606,7 +606,7 @@ p {
 
 .ticket-top {
   padding-bottom:18px;
-  border-bottom:1px dashed #bcc6ac
+  border-bottom:1px dashed #acb7c6
 }
 
 .ticket-value {
@@ -624,7 +624,7 @@ p {
 }
 
 .ticket-bottom {
-  border-top:1px dashed #bcc6ac;
+  border-top:1px dashed #acb7c6;
   padding-top:20px;
   letter-spacing:0;
   font-size:12px;
@@ -633,7 +633,7 @@ p {
 
 .ticket-flower {
   font-size:44px;
-  color:#638456;
+  color:#566a84;
   line-height:1
 }
 
@@ -657,16 +657,16 @@ p {
   place-items:center;
   width:59px;
   height:59px;
-  background:#e8ecdf;
-  border:1px solid #d5dccb;
+  background:#dfe5ec;
+  border:1px solid #cbd2dc;
   border-radius:50%;
   font:italic 25px Georgia,serif;
-  color:#5c7254
+  color:#546172
 }
 
 .personal-label p {
   font-size:12px;
-  color:#314632
+  color:#313a46
 }
 
 .personal-label p span {
@@ -686,7 +686,7 @@ p {
 .signature {
   display:block;
   font:italic 35px Georgia,serif;
-  color:#657b52;
+  color:#52647b;
   margin-top:25px
 }
 
@@ -722,7 +722,7 @@ p {
 .home-faq summary:after {
   content:'+';
   font-size:19px;
-  color:#70815e
+  color:#5e6d81
 }
 
 .home-faq details[open] summary:after {
@@ -736,8 +736,8 @@ p {
 
 .closing-section {
   border-radius:13px;
-  background:#244b3e;
-  color:#fffdf0;
+  background:#24354b;
+  color:#f0f6ff;
   padding:43px 45px;
   display:flex;
   align-items:center;
@@ -747,7 +747,7 @@ p {
 }
 
 .closing-section .eyebrow {
-  color:#c3d2a7
+  color:#a7bad2
 }
 
 .closing-section h2 {
@@ -756,9 +756,9 @@ p {
 }
 
 .closing-section .button {
-  background:#e6edb9;
-  color:#244b3e;
-  border-color:#e6edb9;
+  background:#b9d0ed;
+  color:#24354b;
+  border-color:#b9d0ed;
   flex-shrink:0
 }
 
@@ -785,7 +785,7 @@ p {
 .app-footer a:last-child {
   font-size:11px;
   font-weight:650;
-  color:#386348
+  color:#384b63
 }
 
 [hidden] {

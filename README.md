@@ -1,6 +1,6 @@
 # BYU ByteBack — functional MVP
 
-Turn community tech waste into educational opportunity for Provo-area college students. A welcoming homepage and a guided four-step app connect donors and students. The design uses warm paper colors, clear next steps, and personal notes from the donor to the next student.
+Turn community tech waste into educational opportunity for Provo-area college students. A blue marketplace storefront and a guided four-step donation app connect donors and students. Browse real reference photos, featured sliding panels, and recommendations by study purpose or budget. Personal donor notes and custom reward choices connect the two sides of the process.
 
 **Independent academic project; not affiliated with, sponsored by, or endorsed by Brigham Young University.**
 
@@ -12,7 +12,7 @@ Requires Python 3.10+ and a modern browser. No package installation or build ste
 python3 server.py
 ```
 
-On Windows, use `py server.py`. Open **http://localhost:4173/app.html** for the app or **http://localhost:4173/** for the landing page. VS Code's **Terminal → Run Task → Preview BYU ByteBack on localhost** runs the same server.
+On Windows, use `py server.py`. Open **http://localhost:4173/app.html** for the app or **http://localhost:4173/** for the storefront. VS Code's **Terminal → Run Task → Preview BYU ByteBack on localhost** runs the same server.
 
 If port 4173 is already occupied, use another port:
 
@@ -22,7 +22,7 @@ PORT=4174 PUBLIC_URL=http://localhost:4174 python3 server.py
 
 On Windows, set `PORT` and `PUBLIC_URL` in `.env` instead. Use the exact `PUBLIC_URL` hostname in your browser (localhost and 127.0.0.1 are different origins).
 
-The full app needs `server.py`. Live Server, `python -m http.server`, opening an HTML file directly, and GitHub Pages can display the landing page but cannot run accounts, orders, or shipping. The app explains this if its backend is unavailable.
+The full app needs `server.py`. Live Server, `python -m http.server`, opening an HTML file directly, and GitHub Pages can display the storefront and sample recommendations but cannot run accounts, orders, or shipping. The app explains this if its backend is unavailable.
 
 ## What works
 
@@ -33,7 +33,8 @@ The full app needs `server.py`. Live Server, `python -m http.server`, opening an
 - **Tracking:** saved activity timeline with dashboard refresh every 15 seconds. Carrier data is retrieved at most once per minute per active shipment. Carrier transit status and organizer-verified refurbishment progress remain separate.
 - **Management:** saved orders, edit notes/address before processing, cancel eligible orders, QR drop-off/pickup passes, printable summaries, unique receipts, and share prompts.
 - **Email:** automatic order/action receipts in a test inbox; STARTTLS SMTP delivery when live mode is configured. Failed delivery is visible and can be retried.
-- **Student flow:** searchable/sortable refurbished computer catalog, student eligibility acknowledgement, reservation, pickup pass, cancellation/restocking, and organizer-confirmed collection. Listed prices are due at pickup; no online payment processing.
+- **Storefront:** three featured slides with arrows, keyboard controls, dots and optional autoplay; horizontally scrolling recommendations; seven brand collections (Apple, Dell, Lenovo/ThinkPad, HP, ASUS, Acer, Microsoft); OS shortcuts; Intel, AMD, NVIDIA and Apple silicon collections. Nine sample products share a single data source across the homepage and backend. Locally hosted, openly licensed reference photos have attribution on `image-credits.html`.
+- **Student flow:** searchable refurbished computer catalog with combinable brand, OS, CPU, graphics and budget filters, sorting by price or memory, shareable filter URLs, student eligibility acknowledgement, reservation, pickup pass, cancellation/restocking, and organizer-confirmed collection. Listed prices are due at pickup; no online payment processing.
 - **Custom donor reward:** choose a personal $20 ByteBack credit or a $20 code to give to a friend. One code is issued per collected device, never just for submitting a donation. Personal codes work only for the donor; gift codes work for another student. Codes apply up to $20 to a priced reservation, have no cash value or remaining balance, are held during reservation, restored on cancellation, and used on collection. Demo credits are explicitly labeled.
 - **Personal touches:** optional first name and a note to the next student, with an explicit notice that these appear in the catalog. Donors receive a named welcome and a reward email after collection. No fabricated testimonials or campus partnerships.
 - **Organizer workflow:** configured organizer accounts can advance verified processing stages. A donation reaching “Ready for student” adds its devices to the catalog. Before publishing, the organizer enters verified specifications and a whole-dollar pickup price from $0 to $500; $0 makes the device free. Legacy API callers without listing details retain the free default. All devices in a donation must be collected before the donation is complete.
@@ -74,20 +75,23 @@ Run the independent HTTP/SQLite tests:
 ```sh
 python3 -m unittest discover -s tests -v
 node --check app.js
+node --check shop.js
+node --check store.js
 ```
 
-Tests cover single-use authentication, unauthorized access, CSRF, origin validation, private-file protection, invalid donations/addresses, idempotent submissions, competing reservations, cancellation/restocking, order editing, mock labels and receipts, live role enforcement, and the full donation → catalog → reservation → collection → donor-reward lifecycle, personal/gift-code access, discount application, cancellation restoration, and organizer pricing. Tests use a temporary database and never alter your app data.
+The 14 tests cover storefront metadata, reservation persistence across catalog reseeding, single-use authentication, unauthorized access, CSRF, origin validation, private-file protection, invalid donations/addresses, idempotent submissions, competing reservations, cancellation/restocking, order editing, mock labels and receipts, live role enforcement, and the full donation → catalog → reservation → collection → donor-reward lifecycle, personal/gift-code access, discount application, cancellation restoration, and organizer pricing. Tests use a temporary database and never alter your app data.
 
-Browser checks exercised donation, sign-in, reservation, cancellation, reload persistence, QR rendering, and screen widths of 320, 375, 768, and 1440 pixels. Checked donation and dashboard screens had no automated WCAG 2 A/AA or WCAG 2.1 AA violations. Automated checks do not constitute accessibility certification.
+Browser checks exercised featured slides, purpose recommendations, homepage search, combined catalog filters, empty results, persistent filter/sort URLs, product deep links, sign-in to reservation, donation, cancellation, reload persistence, QR rendering, and screen widths of 320, 375, 768, and 1440 pixels. The new desktop/mobile homepage, filtered catalog, and blue donation screen had no automated WCAG 2 A/AA or WCAG 2.1 AA violations. Automated checks do not constitute accessibility certification.
 
 ## Files
 
-- `index.html`, `brand.css`: redesigned responsive homepage and shared visual system. `styles.css` and `script.js` are retained legacy assets; the new homepage does not load them.
+- `index.html`, `store.css`, `store.js`, `shop.js`, `brand.css`: blue storefront, shared product cards/filters, featured carousel, recommendation rail, and shared visual system. `styles.css` and `script.js` are retained legacy assets; the new homepage does not load them.
 - `app.html`, `app.css`, `app.js`: functional app, donation wizard, catalog, dashboard, dialogs, and print layouts.
 - `server.py`: dependency-free HTTP backend, SQLite persistence, authentication, SMTP, and EasyPost adapter.
 - `.env.example`: local/live configuration template.
 - `tests/test_server.py`: isolated backend integration tests.
 - `qr.js`: vendored qrcode-generator 1.4.4, MIT licensed (see `assets/QR-LICENSE.txt`). QR codes contain the pass identifier only, never account credentials.
-- `assets/`: original artwork, favicon, social card, self-hosted Manrope font and licenses.
+- `catalog-data.json`: sample product metadata used by the demo backend and static homepage fallback. Live inventory is still populated by verified donations.
+- `assets/`: locally hosted reference photos, original artwork, favicon, social card, self-hosted Manrope font and licenses. `image-credits.html` and `assets/image-credits.json` record image authors, source URLs, and licenses. Photos illustrate models; they do not prove sample specifications or physical inventory.
 
 Keep `.data/` backed up if preserving pilot orders. To reset a disposable local demo, stop the server, move `.data/byteback.sqlite3` and any matching WAL/SHM files aside, and restart. Use a new `BYTEBACK_DB` path for a fresh test without deleting anything.

@@ -68,6 +68,7 @@
   function updateAccount() { $('#account').textContent = user ? 'My account' : 'Sign in'; $('#account').title = user?.email || 'Sign in with your email'; }
   function signIn() {
     returnRoute = route === 'success' ? 'orders' : route;
+    try { sessionStorage.setItem('byteback-login-context', JSON.stringify({route:returnRoute, item:pendingReservation, search:location.search})); } catch { /* In-memory context remains available. */ }
     openModal(`<p class="eyebrow">NICE TO HAVE YOU HERE</p><h2 id="modal-title">Let’s save your place.</h2><p>We’ll send you a sign-in link so you can find your donation, receipts, and rewards again. No password needed.</p><form id="login-form"><label>Email address<input name="email" type="email" autocomplete="email" maxlength="254" placeholder="you@example.com" required></label><button class="button" type="submit">Send sign-in link ↗</button></form><p class="small">${config.demo ? 'Local testing mode: your link appears here instead of being emailed. Use a fictional address.' : 'Your link expires in 15 minutes and can only be used once.'}</p><div id="login-result" role="status"></div>`);
   }
   function signedInOrPrompt() { if (user) return true; signIn(); return false; }
@@ -104,17 +105,29 @@
     else content = `<div class="form-heading"><span class="eyebrow">STEP 4 OF 4 · REVIEW</span><h2>Does everything look right${draft.first_name ? ', '+esc(draft.first_name) : ''}?</h2><p>Check the details below. You can go back to change anything before confirming.</p></div>${basket()}<dl class="review-list"><dt>Handoff</dt><dd>${draft.method === 'shipping' ? (config.demo ? 'Shipping · demo label' : 'Prepaid shipping') : 'Local drop-off'} <button class="text-button" type="button" data-next="2">Change</button></dd><dt>${draft.method === 'shipping' ? 'Return address' : 'Location'}</dt><dd>${draft.method === 'shipping' ? esc([draft.address.name,draft.address.street1,draft.address.city,draft.address.state,draft.address.zip].filter(Boolean).join(', ')) : esc(config.dropoff)}</dd><dt>Your thank-you</dt><dd>${draft.reward_choice === 'gift' ? '$20 code to share with a friend' : '$20 credit for a future computer'} <button class="text-button" type="button" data-next="3">Change</button></dd>${draft.student_note ? `<dt>Your note</dt><dd>“${esc(draft.student_note)}”</dd>` : ''}<dt>Your cost</dt><dd><strong>$0</strong></dd></dl><form id="donation-form"><div class="pledge-panel"><h3>Before your computer leaves you</h3><p class="small muted">Back up your files, sign out of your accounts, and remove activation locks.</p><label class="check"><input name="pledge" type="checkbox" required ${draft.pledge ? 'checked' : ''}><span>I’ll prepare my devices and authorize the team to erase their data. I understand that erased files cannot be recovered.</span></label></div><p class="small muted">${config.demo ? 'This is a test donation. No physical handoff is arranged.' : 'Your confirmation and handoff instructions will be sent by email.'}</p><div class="wizard-footer"><button class="text-button" type="button" data-next="3">← Your thank-you</button><button class="button" type="submit">${user ? 'Confirm donation' : 'Sign in & confirm'} <span aria-hidden="true">↗</span></button></div></form>`;
     view.innerHTML = intro('DONATE A DEVICE', 'Let’s get it to the next student.', 'Four short steps. A clear plan for your device.') + `<div class="app-grid"><div><ol class="stepper">${['Your devices','Handoff','Your thank-you','Review'].map((t,i) => `<li class="${step > i+1 ? 'complete' : step === i+1 ? 'active' : ''}" ${step === i+1 ? 'aria-current="step"' : ''}><button type="button" data-next="${i+1}" ${i+1>step ? 'disabled' : ''}><span>${step > i+1 ? '✓' : i+1}</span>${t}</button></li>`).join('')}</ol><section class="app-card wizard-card">${content}</section></div>${impact()}</div>`;
   }
+  let catalogItemFilter='';
   async function renderCatalog() {
-    catalog = (await api('catalog')).items;
-    view.innerHTML = intro('THE STUDENT CATALOG', 'A computer for what you’re working on.', 'Find one that fits your classes and your budget. Reserve online, collect locally, and pay at pickup.') + `<p class="small muted">${config.demo ? 'Sample inventory for testing. Devices, availability, and prices are illustrative.' : 'Inspected and data-wiped devices, listed by the refurbishment team.'}</p><div class="catalog-toolbar"><input id="catalog-search" type="search" aria-label="Search computers" placeholder="Search by model or specifications"><select id="catalog-sort" aria-label="Sort computers"><option value="default">Recently available</option><option value="low">Price: low to high</option><option value="high">Price: high to low</option></select></div><div id="catalog-results" class="catalog-grid"></div>`;
-    filterCatalog();
+    catalog=(await api('catalog')).items;
+    const params=new URLSearchParams(location.search);
+    catalogItemFilter=params.get('item')||'';
+    view.innerHTML=intro('THE BYTEBACK COMPUTER STORE','Find your fit. Keep your budget.','Choose your brand, operating system, and hardware. Reserve online, then collect locally.')+`<section class="store-catalog"><p class="small muted">${config.demo ? 'Demo collection · Reference photos and sample configurations. No real purchase or pickup is arranged.' : 'Available community devices. Check each listing’s specifications before reserving.'}</p>${window.ByteBackShop.filters(params)}<div id="catalog-results" class="catalog-grid"></div><p class="catalog-disclaimer">Reference photos show the model family; sample hardware configurations may differ. <a href="image-credits.html">Photo credits & licenses</a>.</p></section>`;
+    if(['low','high','ram'].includes(params.get('sort'))) $('#catalog-sort').value=params.get('sort');
+    filterCatalog(false);
   }
-  function filterCatalog() {
-    const search = $('#catalog-search').value.toLowerCase();
-    const sort = $('#catalog-sort').value;
-    const items = catalog.filter(i => (i.name + i.specs).toLowerCase().includes(search));
-    if (sort !== 'default') items.sort((a,b) => sort === 'low' ? a.price-b.price : b.price-a.price);
-    $('#catalog-results').innerHTML = items.map(i => `<article class="app-card catalog-card"><div class="catalog-art"><span class="pill">${config.demo ? 'SAMPLE DEVICE' : 'READY FOR A STUDENT'}</span>${icon(/iPad|Tablet/i.test(i.name+i.specs) ? 'Tablet' : /Desktop/i.test(i.specs) ? 'Desktop' : 'Laptop')}</div><div class="catalog-details"><h2>${esc(i.name)}</h2><p>${esc(i.specs)}</p>${i.student_note ? `<blockquote class="donor-note">“${esc(i.student_note)}”<cite>— ${esc(i.donor_name)}</cite></blockquote>` : '<div class="device-checks"><span>✓ Data wipe</span><span>✓ Inspection</span><span>✓ Local pickup</span></div>'}<div class="catalog-bottom"><span class="price">${i.price ? '$'+i.price : 'Free'}</span><button class="button button-outline" type="button" data-reserve="${esc(i.id)}">Reserve →</button></div></div></article>`).join('') || '<div class="empty"><h2>No computers found.</h2><p>Try a different search or check back after more devices have been refurbished.</p></div>';
+  function filterCatalog(updateURL=true) {
+    if(!$('#catalog-search')) return;
+    const f={q:$('#catalog-search').value,item:catalogItemFilter};
+    document.querySelectorAll('[data-shop-filter]').forEach(x=>f[x.dataset.shopFilter]=x.value);
+    let items=window.ByteBackShop.filter(catalog,f);
+    const sort=$('#catalog-sort').value;
+    if(sort!=='default') f.sort=sort;
+    if(sort!=='default') items.sort((a,b)=>sort==='ram'?(b.ram||0)-(a.ram||0):sort==='low'?a.price-b.price:b.price-a.price);
+    $('#catalog-results').innerHTML=items.map(i=>window.ByteBackShop.card(i,{reserve:true})).join('')||'<div class="empty catalog-empty"><h2>No computers match those filters.</h2><p>Try another brand or operating system, or clear your filters to see every available device.</p></div>';
+    $('#result-count').textContent=items.length+' computer'+(items.length===1?'':'s')+' found'+(catalogItemFilter?' · Selected device':'');
+    if(updateURL) {
+      const query=new URLSearchParams(Object.entries(f).filter(([k,v])=>v));
+      history.replaceState(null,'',location.pathname+(query.size?'?'+query:'')+'#catalog');
+    }
   }
   function success(order, status) {
     lastOrder = order; route = 'success';
@@ -208,7 +221,15 @@
     const hash = location.hash.slice(1);
     if (hash.startsWith('verify=')) {
       const token = hash.slice(7);
-      history.replaceState(null, '', location.pathname+'#'+returnRoute);
+      let returnSearch=location.search;
+      try {
+        const saved=JSON.parse(sessionStorage.getItem('byteback-login-context'));
+        if(saved && ['donate','catalog','orders','admin'].includes(saved.route)) {
+          returnRoute=saved.route; pendingReservation=saved.item; returnSearch=saved.search || '';
+        }
+        sessionStorage.removeItem('byteback-login-context');
+      } catch { /* Continue with this page’s context. */ }
+      history.replaceState(null, '', location.pathname+returnSearch+'#'+returnRoute);
       try {
         user=await api('auth/verify',{token}); updateAccount(); if(modal.open) modal.close();
         route=returnRoute;
@@ -245,6 +266,7 @@
     const form = event.target;
     event.preventDefault();
     if (!form.reportValidity()) return;
+    if(form.id==='catalog-search-form') { filterCatalog(); return; }
     const fields = Object.fromEntries(new FormData(form));
     const button = event.submitter;
     guarded(async () => {
@@ -313,6 +335,7 @@
         await dashboard(route==='admin'); message('Order '+result.order.status.toLowerCase()+'.');
       } else if(b.dataset.printLabel) printOrder(findOrder(b.dataset.printLabel),true);
       else if(b.hasAttribute('data-refresh')) await refresh();
+      else if(b.id==='clear-filters') { catalogItemFilter=''; $('#catalog-search').value=''; document.querySelectorAll('[data-shop-filter]').forEach(x=>x.value=''); $('#catalog-sort').value='default'; filterCatalog(); }
     });
   });
   function reserveDialog(id) {
@@ -327,7 +350,7 @@
       $('#shipping-fields').hidden=!shipping; $('#shipping-fields fieldset').disabled=!shipping;
       preserveStep();
     }
-    if(event.target.id==='catalog-sort') filterCatalog();
+    if(event.target.id==='catalog-sort'||event.target.matches('[data-shop-filter]')) filterCatalog();
   });
   document.addEventListener('input',event=>{
     if(event.target.id==='catalog-search') filterCatalog();

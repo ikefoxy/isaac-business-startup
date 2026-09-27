@@ -106,6 +106,26 @@ class MVPTests(unittest.TestCase):
         self.assertEqual(self.bob.request('POST', '/api/orders/'+first['order']['id']+'/cancel', {})[0], 404)
         self.assertEqual(self.bob.request('GET', '/api/orders')[1]['orders'], [])
 
+    def test_storefront_metadata_and_restart_preserves_reservations(self):
+        status, result = self.alice.request('GET', '/api/catalog')
+        self.assertEqual(status, 200)
+        items = result['items']
+        self.assertTrue({'Apple', 'Dell', 'Lenovo', 'HP', 'ASUS', 'Acer', 'Microsoft'} <= {p['brand'] for p in items})
+        self.assertTrue({'macOS', 'Windows', 'Linux'} <= {p['os'] for p in items})
+        self.assertTrue({'Intel', 'AMD', 'Apple silicon'} <= {p['cpu'] for p in items})
+        self.assertIn('NVIDIA', {p['gpu'] for p in items})
+        for p in items:
+            self.assertTrue((server.ROOT / p['photo']).is_file())
+        status, _ = self.alice.request('POST', '/api/orders', {
+            'kind':'reservation', 'item_id':'demo-asus', 'student':True,
+            'request_key':'storefront-restart-check'})
+        self.assertEqual(status, 200)
+        server.init_db()
+        available = self.alice.request('GET', '/api/catalog')[1]['items']
+        self.assertNotIn('demo-asus', {p['id'] for p in available})
+        with patch.object(server, 'DEMO', False):
+            self.assertFalse(self.alice.request('GET', '/api/catalog')[1]['items'])
+
     def test_full_donor_student_handoff_and_incentive(self):
         order = self.donation()[1]['order']
         path = '/api/orders/' + order['id']

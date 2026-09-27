@@ -1,0 +1,180 @@
+[
+  {
+    "id": "demo-macbook",
+    "name": "Apple MacBook Air M1",
+    "brand": "Apple",
+    "os": "macOS",
+    "cpu": "Apple silicon",
+    "gpu": "Apple",
+    "ram": 8,
+    "storage": 256,
+    "price": 329,
+    "screen": "13.3-inch",
+    "specs": "Apple M1 \u00b7 8 GB RAM \u00b7 256 GB SSD \u00b7 macOS",
+    "photo": "assets/product-macbook-air.png",
+    "badge": "Lightweight pick",
+    "uses": [
+      "Everyday study",
+      "Creative work"
+    ],
+    "reason": "A portable option for notes, presentations, and everyday coursework."
+  },
+  {
+    "id": "demo-thinkpad",
+    "name": "Lenovo ThinkPad T480",
+    "brand": "Lenovo",
+    "os": "Linux",
+    "cpu": "Intel",
+    "gpu": "Intel",
+    "ram": 8,
+    "storage": 256,
+    "price": 79,
+    "screen": "14-inch",
+    "specs": "Intel Core i5 \u00b7 8 GB RAM \u00b7 256 GB SSD \u00b7 Linux Mint",
+    "photo": "assets/product-thinkpad-t480.jpg",
+    "badge": "Budget pick",
+    "uses": [
+      "Everyday study",
+      "Coding"
+    ],
+    "reason": "The lowest-priced laptop in our sample collection, with Linux Mint installed."
+  },
+  {
+    "id": "demo-dell",
+    "name": "Dell Latitude 7280",
+    "brand": "Dell",
+    "os": "Linux",
+    "cpu": "Intel",
+    "gpu": "Intel",
+    "ram": 16,
+    "storage": 256,
+    "price": 119,
+    "screen": "12.5-inch",
+    "specs": "Intel Core i5 \u00b7 16 GB RAM \u00b7 256 GB SSD \u00b7 Linux Mint",
+    "photo": "assets/product-dell.jpg",
+    "badge": "Everyday study",
+    "uses": [
+      "Everyday study",
+      "Coding"
+    ],
+    "reason": "16 GB of memory for browser tabs, documents, and class projects."
+  },
+  {
+    "id": "demo-thinkpad-amd",
+    "name": "Lenovo ThinkPad T14 Gen 2",
+    "brand": "Lenovo",
+    "os": "Linux",
+    "cpu": "AMD",
+    "gpu": "AMD",
+    "ram": 16,
+    "storage": 512,
+    "price": 249,
+    "screen": "14-inch",
+    "specs": "AMD Ryzen 5 PRO \u00b7 16 GB RAM \u00b7 512 GB SSD \u00b7 Ubuntu",
+    "photo": "assets/product-thinkpad-t14.jpg",
+    "badge": "Coding pick",
+    "uses": [
+      "Coding",
+      "Everyday study"
+    ],
+    "reason": "An AMD-based Linux option with room for development tools and projects."
+  },
+  {
+    "id": "demo-hp",
+    "name": "HP EliteBook 850 G5",
+    "brand": "HP",
+    "os": "Windows",
+    "cpu": "Intel",
+    "gpu": "Intel",
+    "ram": 16,
+    "storage": 512,
+    "price": 179,
+    "screen": "15.6-inch",
+    "specs": "Intel Core i5 \u00b7 16 GB RAM \u00b7 512 GB SSD \u00b7 Windows 11",
+    "photo": "assets/product-hp-elitebook.png",
+    "badge": "More screen space",
+    "uses": [
+      "Everyday study",
+      "Coding"
+    ],
+    "reason": "A larger display for spreadsheets, research, and side-by-side windows."
+  },
+  {
+    "id": "demo-asus",
+    "name": "ASUS ROG Zephyrus G14",
+    "brand": "ASUS",
+    "os": "Windows",
+    "cpu": "AMD",
+    "gpu": "NVIDIA",
+    "ram": 16,
+    "storage": 512,
+    "price": 449,
+    "screen": "14-inch",
+    "specs": "AMD Ryzen 7 \u00b7 NVIDIA GeForce GTX 1650 \u00b7 16 GB RAM \u00b7 512 GB SSD \u00b7 Windows 11",
+    "photo": "assets/product-asus-rog.jpg",
+    "badge": "Dedicated graphics",
+    "uses": [
+      "Creative work",
+      "Coding"
+    ],
+    "reason": "A dedicated NVIDIA graphics option. Check your course software requirements before choosing."
+  },
+  {
+    "id": "demo-surface",
+    "name": "Microsoft Surface Laptop Go",
+    "brand": "Microsoft",
+    "os": "Windows",
+    "cpu": "Intel",
+    "gpu": "Intel",
+    "ram": 8,
+    "storage": 128,
+    "price": 189,
+    "screen": "12.4-inch",
+    "specs": "Intel Core i5 \u00b7 8 GB RAM \u00b7 128 GB SSD \u00b7 Windows 11",
+    "photo": "assets/product-surface.jpg",
+    "badge": "Campus carry",
+    "uses": [
+      "Everyday study"
+    ],
+    "reason": "A compact Windows laptop for writing, reading, and taking to class."
+  },
+  {
+    "id": "demo-acer",
+    "name": "Acer Swift 7",
+    "brand": "Acer",
+    "os": "Linux",
+    "cpu": "Intel",
+    "gpu": "Intel",
+    "ram": 8,
+    "storage": 256,
+    "price": 159,
+    "screen": "13.3-inch",
+    "specs": "Intel Core i5 \u00b7 8 GB RAM \u00b7 256 GB SSD \u00b7 Linux Mint",
+    "photo": "assets/product-acer-swift.jpg",
+    "badge": "Light & simple",
+    "uses": [
+      "Everyday study",
+      "Coding"
+    ],
+    "reason": "A slim Linux option for everyday work and learning to code."
+  },
+  {
+    "id": "demo-ipad",
+    "name": "Apple iPad (7th generation)",
+    "brand": "Apple",
+    "os": "iPadOS",
+    "cpu": "Apple silicon",
+    "gpu": "Apple",
+    "ram": 3,
+    "storage": 32,
+    "price": 59,
+    "screen": "10.2-inch",
+    "specs": "Apple A10 \u00b7 3 GB RAM \u00b7 32 GB storage \u00b7 iPadOS",
+    "photo": "assets/product-ipad.jpg",
+    "badge": "Tablet option",
+    "uses": [
+      "Everyday study"
+    ],
+    "reason": "A tablet for reading and handwritten notes. Check desktop-software needs before reserving."
+  }
+]
