@@ -95,3 +95,33 @@ Browser checks exercised featured slides, purpose recommendations, homepage sear
 - `assets/`: locally hosted reference photos, original artwork, favicon, social card, self-hosted Manrope font and licenses. `image-credits.html` and `assets/image-credits.json` record image authors, source URLs, and licenses. Photos illustrate models; they do not prove sample specifications or physical inventory.
 
 Keep `.data/` backed up if preserving pilot orders. To reset a disposable local demo, stop the server, move `.data/byteback.sqlite3` and any matching WAL/SHM files aside, and restart. Use a new `BYTEBACK_DB` path for a fresh test without deleting anything.
+
+## Engineering playbook
+
+Open **http://localhost:4173/playbook.html** after starting `python3 server.py`. The storefront footer also links to the handbook. It covers all nine employee-playbook assignment areas, uses a clickable winding roadmap with nine stops, short actions, expandable commands, saved completion progress, a visible personal Kanban board with task creation, and prominent VS Code download links. The new 1774 × 887 hero is an AI-created concept image; the small supplied photos are no longer used in this guide. It can be printed or saved as PDF with all nine stages. The standalone static page also works on GitHub Pages.
+
+Development tooling is optional for running the app, but required for contributing:
+
+```sh
+npm ci
+python3 -m venv .venv
+.venv/bin/python -m pip install -r requirements-dev.txt
+git config core.hooksPath .githooks
+npm run check
+.venv/bin/ruff check .
+python3 -m unittest discover -s tests -v
+```
+
+On Windows, use Git Bash for the hook, `py` for Python, and `.venv/Scripts/python` and `.venv/Scripts/ruff.exe` for virtual environment tools. ESLint checks the current app, shop, store, and playbook scripts. Prettier checks the new playbook and tooling files; legacy storefront formatting is not part of that initial gate. Ruff checks selected Python syntax/correctness rules. GitHub workflows repeat checks and tests, audit npm dependencies, and define CodeQL scanning. These remote workflows run only after the files are pushed. A repository administrator must activate branch protection (one independent review, required quality/tests checks, resolved conversations, no force pushes) and confirm scanning availability. No remote settings are claimed to be configured.
+
+Assignment page: **https://ikefoxy.github.io/isaac-business-startup/playbook.html**. GitHub Pages publishes from `main` / root. Open the link, enter an optional first name, click **Take my seat**, then choose **New-hire playbook** to explore all nine stages. **Kanban board** and **Team feedback** each have their own screen. No login or installation is needed to read the guide. See [the assignment checklist](docs/assignment-checklist.md).
+
+### Participant feedback and first-day demo
+
+The October 9 feedback from Jared, Joe, Katrina, and Cory is archived in [docs/participant-feedback-2026-10-09.md](docs/participant-feedback-2026-10-09.md) with the four published GitHub issue links. The separate Team feedback screen links directly to these real tasks. They are requested improvements, not completed storefront changes.
+
+The playbook’s computer simulation accepts an optional first name, animates a short boot sequence, and opens workspace shortcuts. The name is kept in memory for the visit; no authentication, network request, or account creation occurs. Skip and replay controls are available; reduced-motion preference bypasses the sequence. The exact setup commands and all nine assignment categories remain in the guide.
+
+### Interactive ByteBack desktop
+
+Open `playbook.html` for the first-day simulation: enter an optional first name, watch the illustrated teammate type during startup, then use the real roadmap and Kanban inside the computer. The new-hire playbook and Kanban have separate app screens on desktop and mobile. The wallpaper remains visible around translucent app panels. Participant feedback has a third, independent screen with its real GitHub issue links. All nine stages keep exact setup/configuration details in expandable panels. Names are not saved; a session flag remembers the simulated sign-in. Roadmap completion and personal task status remain in local storage, separate from the four real participant-feedback GitHub issues. Reduced-motion skips startup animation, and printing includes all nine stages with their details.

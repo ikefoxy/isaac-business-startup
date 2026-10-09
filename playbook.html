@@ -1,0 +1,1306 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#12345c" />
+    <title>ByteBack · New-hire playbook & Kanban</title>
+    <meta
+      name="description"
+      content="Nine clear stops to join ByteBack: tools, setup, workflow, Kanban, quality, and launch."
+    />
+    <link rel="icon" href="assets/favicon.svg" />
+    <link rel="stylesheet" href="playbook.css?v=submission-20261009b" />
+    <script src="playbook.js?v=submission-20261009b" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#playbook">Skip to the nine stages</a>
+    <header class="header">
+      <a class="brand" href="index.html" aria-label="ByteBack home"
+        ><span class="brand-mark" aria-hidden="true">↻</span
+        ><span class="brand-wordmark"
+          >byteback<span class="brand-dot">.</span></span
+        ></a
+      ><span class="header-label">NEW-HIRE PLAYBOOK</span>
+      <div class="header-actions">
+        <a href="https://github.com/ikefoxy/isaac-business-startup"
+          >Repository <span aria-hidden="true">↗</span></a
+        ><button type="button" id="print-guide">
+          Save as PDF <span aria-hidden="true">↗</span>
+        </button>
+      </div>
+    </header>
+    <main>
+      <section class="welcome-strip">
+        <span class="eyebrow">BYTEBACK / DAY ONE</span>
+        <h1>Your first day <span>at ByteBack.</span></h1>
+        <p>
+          Your new-hire playbook. Nine simple stages. Then make your first move
+          on Kanban.
+        </p>
+      </section>
+      <div class="computer-demo">
+        <div class="computer-frame" id="demo-computer" data-mode="login">
+          <div class="computer-topbar">
+            <span class="window-dots" aria-hidden="true"
+              ><i></i><i></i><i></i></span
+            ><span>byteback OS</span
+            ><span class="demo-tag">FIRST-DAY SIMULATOR</span>
+          </div>
+          <div class="computer-screen">
+            <div class="login-view" data-demo-view="login">
+              <div class="desk-scene" aria-hidden="true">
+                <svg viewBox="0 0 420 250" fill="none">
+                  <ellipse
+                    cx="208"
+                    cy="230"
+                    rx="180"
+                    ry="14"
+                    fill="#102b40"
+                    opacity=".13"
+                  />
+                  <path
+                    d="M53 188H375M72 188V232M355 188V232"
+                    stroke="#8db3b5"
+                    stroke-width="8"
+                    stroke-linecap="round"
+                  />
+                  <rect
+                    x="209"
+                    y="69"
+                    width="143"
+                    height="98"
+                    rx="10"
+                    fill="#153a54"
+                  />
+                  <rect
+                    x="218"
+                    y="78"
+                    width="125"
+                    height="77"
+                    rx="5"
+                    fill="#6bc2a5"
+                  />
+                  <path
+                    d="m260 100-13 12 13 12m40-24 13 12-13 12m-18-28-8 32"
+                    stroke="#153a54"
+                    stroke-width="5"
+                  />
+                  <path
+                    d="M280 167V184M249 184H312"
+                    stroke="#153a54"
+                    stroke-width="7"
+                  />
+                  <path
+                    d="M111 117Q155 98 183 145L191 184H109Z"
+                    fill="#3576d2"
+                  />
+                  <circle cx="141" cy="73" r="29" fill="#f1bd97" />
+                  <path
+                    d="M113 67q-3-37 32-31 25 3 26 30l-21-12-37 13Z"
+                    fill="#183046"
+                  />
+                  <path
+                    d="M135 86q10 7 17-2"
+                    stroke="#8c4d40"
+                    stroke-width="3"
+                    stroke-linecap="round"
+                  />
+                  <g class="typing-arm">
+                    <path
+                      d="M158 128 185 168 236 177"
+                      stroke="#f1bd97"
+                      stroke-width="17"
+                      stroke-linecap="round"
+                    />
+                    <path
+                      d="m228 175 19 1"
+                      stroke="#f1bd97"
+                      stroke-width="10"
+                      stroke-linecap="round"
+                    />
+                  </g>
+                  <g class="typing-arm other">
+                    <path
+                      d="M122 133 149 174 207 178"
+                      stroke="#e5a980"
+                      stroke-width="15"
+                      stroke-linecap="round"
+                    />
+                  </g>
+                  <rect
+                    x="196"
+                    y="180"
+                    width="76"
+                    height="7"
+                    rx="3"
+                    fill="#28465b"
+                  />
+                  <path
+                    d="M123 191v39m46-39 12 39"
+                    stroke="#233d53"
+                    stroke-width="14"
+                    stroke-linecap="round"
+                  />
+                  <path
+                    d="M92 139v49h74"
+                    stroke="#446477"
+                    stroke-width="9"
+                    stroke-linecap="round"
+                  />
+                  <path d="M366 150h18l-3 35h-12Z" fill="#e7b85a" />
+                  <path d="M377 151v-23" stroke="#78a68d" stroke-width="5" />
+                  <path
+                    d="M377 135q-19-15-13-24 17 0 13 24Zm1 0q17-19 22-10-1 12-22 10Z"
+                    fill="#78a68d"
+                  /></svg
+                ><span class="scene-caption"
+                  >You + a keyboard + one good idea.</span
+                >
+              </div>
+              <div class="login-card">
+                <span class="eyebrow">WELCOME, NEW TEAMMATE.</span>
+                <h2>Your first day starts here.</h2>
+                <p>
+                  Get settled. Meet your tools.<br />Let’s bring good tech back
+                  to life.
+                </p>
+                <form id="demo-login">
+                  <label for="demo-name">What should we call you?</label
+                  ><input
+                    id="demo-name"
+                    maxlength="24"
+                    autocomplete="given-name"
+                    placeholder="Your first name (optional)"
+                  /><button type="submit">
+                    Take my seat <span aria-hidden="true">→</span>
+                  </button>
+                </form>
+                <small>Practice sign-in · no password or account needed</small>
+              </div>
+            </div>
+            <div class="boot-view" data-demo-view="boot" hidden>
+              <div class="desk-scene" aria-hidden="true">
+                <svg viewBox="0 0 420 250" fill="none">
+                  <ellipse
+                    cx="208"
+                    cy="230"
+                    rx="180"
+                    ry="14"
+                    fill="#102b40"
+                    opacity=".13"
+                  />
+                  <path
+                    d="M53 188H375M72 188V232M355 188V232"
+                    stroke="#8db3b5"
+                    stroke-width="8"
+                    stroke-linecap="round"
+                  />
+                  <rect
+                    x="209"
+                    y="69"
+                    width="143"
+                    height="98"
+                    rx="10"
+                    fill="#153a54"
+                  />
+                  <rect
+                    x="218"
+                    y="78"
+                    width="125"
+                    height="77"
+                    rx="5"
+                    fill="#6bc2a5"
+                  />
+                  <path
+                    d="m260 100-13 12 13 12m40-24 13 12-13 12m-18-28-8 32"
+                    stroke="#153a54"
+                    stroke-width="5"
+                  />
+                  <path
+                    d="M280 167V184M249 184H312"
+                    stroke="#153a54"
+                    stroke-width="7"
+                  />
+                  <path
+                    d="M111 117Q155 98 183 145L191 184H109Z"
+                    fill="#3576d2"
+                  />
+                  <circle cx="141" cy="73" r="29" fill="#f1bd97" />
+                  <path
+                    d="M113 67q-3-37 32-31 25 3 26 30l-21-12-37 13Z"
+                    fill="#183046"
+                  />
+                  <path
+                    d="M135 86q10 7 17-2"
+                    stroke="#8c4d40"
+                    stroke-width="3"
+                    stroke-linecap="round"
+                  />
+                  <g class="typing-arm">
+                    <path
+                      d="M158 128 185 168 236 177"
+                      stroke="#f1bd97"
+                      stroke-width="17"
+                      stroke-linecap="round"
+                    />
+                    <path
+                      d="m228 175 19 1"
+                      stroke="#f1bd97"
+                      stroke-width="10"
+                      stroke-linecap="round"
+                    />
+                  </g>
+                  <g class="typing-arm other">
+                    <path
+                      d="M122 133 149 174 207 178"
+                      stroke="#e5a980"
+                      stroke-width="15"
+                      stroke-linecap="round"
+                    />
+                  </g>
+                  <rect
+                    x="196"
+                    y="180"
+                    width="76"
+                    height="7"
+                    rx="3"
+                    fill="#28465b"
+                  />
+                  <path
+                    d="M123 191v39m46-39 12 39"
+                    stroke="#233d53"
+                    stroke-width="14"
+                    stroke-linecap="round"
+                  />
+                  <path
+                    d="M92 139v49h74"
+                    stroke="#446477"
+                    stroke-width="9"
+                    stroke-linecap="round"
+                  />
+                  <path d="M366 150h18l-3 35h-12Z" fill="#e7b85a" />
+                  <path d="M377 151v-23" stroke="#78a68d" stroke-width="5" />
+                  <path
+                    d="M377 135q-19-15-13-24 17 0 13 24Zm1 0q17-19 22-10-1 12-22 10Z"
+                    fill="#78a68d"
+                  /></svg
+                ><span class="scene-caption"
+                  >You + a keyboard + one good idea.</span
+                >
+              </div>
+              <div class="boot-card">
+                <span class="eyebrow">PULLING UP YOUR DESKTOP…</span>
+                <h2>Okay, let’s do this.</h2>
+                <p id="boot-message" role="status">
+                  Coffee? Check. Curiosity? Check.
+                </p>
+                <div class="boot-terminal">
+                  <span>BYTEBACK / SIMULATED STARTUP</span>
+                  <pre id="boot-terminal"></pre>
+                </div>
+                <div class="boot-track"><div id="boot-fill"></div></div>
+                <button type="button" id="skip-boot">Skip to my desk →</button>
+              </div>
+              <span class="simulated-cursor" aria-hidden="true">➤</span>
+            </div>
+            <div class="desktop-view" data-demo-view="ready" hidden>
+              <div class="os-bar">
+                <div>
+                  <span class="online-dot"></span
+                  ><strong id="demo-welcome" tabindex="-1"
+                    >You’re in, teammate.</strong
+                  ><span class="os-subtitle"
+                    >Let’s make one good thing better.</span
+                  >
+                </div>
+                <button type="button" id="replay-boot">↻ Replay sign-in</button>
+              </div>
+              <div class="app-toolbar" aria-label="Workspace apps">
+                <button type="button" data-app="roadmap" aria-pressed="true">
+                  <span aria-hidden="true">↝</span> New-hire playbook
+                  <small>Your nine-stage roadmap</small></button
+                ><button type="button" data-app="kanban" aria-pressed="false">
+                  <span aria-hidden="true">▥</span> Kanban board
+                  <small>Your own space to get things done</small></button
+                ><a href="https://code.visualstudio.com/download"
+                  ><span aria-hidden="true">↓</span> Download VS Code
+                  <small>Your real IDE</small></a
+                ><button type="button" data-app="feedback" aria-pressed="false">
+                  <span aria-hidden="true">✦</span> Team feedback
+                  <small>Four voices. Four real issues.</small>
+                </button>
+              </div>
+              <div class="workspace-layout" data-active-app="roadmap">
+                <div class="roadmap-app">
+                  <section
+                    class="guide"
+                    id="playbook"
+                    aria-label="Nine-stage employee playbook"
+                  >
+                    <div class="guide-top">
+                      <div>
+                        <span class="eyebrow">YOUR BYTEBACK PLAYBOOK</span>
+                        <h2>Nine stops to feel right at home.</h2>
+                      </div>
+                      <div class="overall-progress">
+                        <span id="overall-progress" role="status"
+                          >0 of 9 complete</span
+                        >
+                        <div class="progress-track">
+                          <div id="progress-fill"></div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="roadmap-frame">
+                      <nav
+                        class="stage-nav roadmap-nav"
+                        aria-label="Choose a roadmap stop"
+                      >
+                        <svg
+                          class="road-map"
+                          viewBox="0 0 1000 340"
+                          preserveAspectRatio="none"
+                          aria-hidden="true"
+                        >
+                          <path
+                            class="road-shadow"
+                            d="M100 60 H850 C980 60 980 170 850 170 H150 C20 170 20 280 150 280 H880"
+                          />
+                          <path
+                            class="road-surface"
+                            d="M100 60 H850 C980 60 980 170 850 170 H150 C20 170 20 280 150 280 H880"
+                          />
+                          <path
+                            class="road-lanes"
+                            d="M100 60 H850 C980 60 980 170 850 170 H150 C20 170 20 280 150 280 H880"
+                          />
+                        </svg>
+                        <a href="#languages" data-stage-link="0"
+                          ><span>01</span><strong>Languages</strong></a
+                        >
+                        <a href="#workspace" data-stage-link="1"
+                          ><span>02</span><strong>IDE setup</strong></a
+                        >
+                        <a href="#workflow" data-stage-link="2"
+                          ><span>03</span><strong>Workflow</strong></a
+                        >
+                        <a href="#git" data-stage-link="3"
+                          ><span>04</span><strong>Git controls</strong></a
+                        >
+                        <a href="#issues" data-stage-link="4"
+                          ><span>05</span><strong>Kanban</strong></a
+                        >
+                        <a href="#ai" data-stage-link="5"
+                          ><span>06</span><strong>AI tools</strong></a
+                        >
+                        <a href="#quality" data-stage-link="6"
+                          ><span>07</span><strong>Code quality</strong></a
+                        >
+                        <a href="#testing" data-stage-link="7"
+                          ><span>08</span><strong>Testing</strong></a
+                        >
+                        <a href="#operations" data-stage-link="8"
+                          ><span>09</span><strong>Operations</strong></a
+                        >
+                      </nav>
+                      <p class="roadmap-caption">
+                        <span class="little-dot"></span> Nine stops. Click any
+                        yellow marker. You’re driving.
+                      </p>
+                    </div>
+                    <div
+                      class="slide-shell"
+                      id="slide-shell"
+                      tabindex="0"
+                      aria-label="Playbook slides. Use left and right arrow keys to change stage."
+                    >
+                      <div class="slide-topline">
+                        <span id="stage-counter">STAGE 01 / 09</span
+                        ><span
+                          ><i class="little-dot"></i> YOUR DAY-ONE FIELD
+                          GUIDE</span
+                        >
+                      </div>
+                      <div id="slides">
+                        <section class="stage" id="languages" data-stage>
+                          <div class="stage-layout">
+                            <div class="stage-content">
+                              <span class="eyebrow"
+                                >01 / LANGUAGE SELECTION</span
+                              >
+                              <h2>You’re the comeback crew.</h2>
+                              <p class="stage-intro">
+                                That laptop deserves a second act. Here’s the
+                                code that makes it happen.
+                              </p>
+                              <ol class="action-list">
+                                <li>
+                                  <span>1</span>
+                                  <div>
+                                    <h3>Make it clickable.</h3>
+                                    <p>
+                                      HTML builds the page. CSS gives it style.
+                                      Plain JavaScript runs the filters and
+                                      forms—no frontend framework to learn.
+                                    </p>
+                                  </div>
+                                </li>
+                                <li>
+                                  <span>2</span>
+                                  <div>
+                                    <h3>Make it work.</h3>
+                                    <p>
+                                      <code>server.py</code> is the Python
+                                      brain: accounts, donations, orders. We use
+                                      the standard library to keep setup light.
+                                    </p>
+                                  </div>
+                                </li>
+                                <li>
+                                  <span>3</span>
+                                  <div>
+                                    <h3>Make it remember.</h3>
+                                    <p>
+                                      SQLite keeps inventory and orders in one
+                                      local file. Small pilot, simple database.
+                                      Use parameterized SQL every time.
+                                    </p>
+                                  </div>
+                                </li>
+                              </ol>
+                              <div class="takeaway">
+                                <span>YOUR FIRST MOVE</span>Open
+                                <code>app.js</code> and <code>server.py</code>.
+                                See where the interface meets the backend.
+                              </div>
+                            </div>
+                          </div>
+                          <details class="setup-detail">
+                            <summary>The file map <span>+</span></summary>
+                            <div class="detail-body">
+                              <p>
+                                <code>index.html</code> + <code>store.js</code>:
+                                storefront. <code>app.html</code> +
+                                <code>app.js</code>: donation and reservation
+                                app. <code>shop.js</code>: shared shopping
+                                components. <code>brand.css</code>: shared
+                                styling. <code>server.py</code>: API and SQLite.
+                                <code>tests/test_server.py</code>: integration
+                                tests. Node.js is for development checks only.
+                              </p>
+                            </div>
+                          </details>
+                        </section>
+                        <section class="stage" id="workspace" data-stage>
+                          <div class="stage-layout">
+                            <div class="stage-content">
+                              <span class="eyebrow"
+                                >02 / IDE SELECTION & SETUP</span
+                              >
+                              <h2>Let’s wake up ByteBack.</h2>
+                              <p class="stage-intro">
+                                Your mission: get the real app running on your
+                                own laptop.
+                              </p>
+                              <a
+                                class="ide-download"
+                                href="https://code.visualstudio.com/download"
+                                >↓ Download Visual Studio Code
+                                <span>Mac · Windows · Linux</span></a
+                              >
+                              <ol class="action-list">
+                                <li>
+                                  <span>1</span>
+                                  <div>
+                                    <h3>Grab the toolkit.</h3>
+                                    <p>
+                                      Download
+                                      <a
+                                        href="https://code.visualstudio.com/download"
+                                        >VS Code</a
+                                      >,
+                                      <a href="https://git-scm.com/downloads"
+                                        >Git</a
+                                      >,
+                                      <a
+                                        href="https://www.python.org/downloads/"
+                                        >Python 3.10+</a
+                                      >
+                                      and
+                                      <a href="https://nodejs.org/en/download"
+                                        >Node 22.13+</a
+                                      >. Windows? Add Python to PATH.
+                                    </p>
+                                  </div>
+                                </li>
+                                <li>
+                                  <span>2</span>
+                                  <div>
+                                    <h3>Make yourself at home.</h3>
+                                    <p>
+                                      Ask Isaac for repo access. Clone the code
+                                      using the commands below. In VS Code,
+                                      install the recommended Python, ESLint and
+                                      Prettier extensions.
+                                    </p>
+                                  </div>
+                                </li>
+                                <li>
+                                  <span>3</span>
+                                  <div>
+                                    <h3>The fun part: press go.</h3>
+                                    <p>
+                                      Run
+                                      <code>python3 server.py</code> (Windows:
+                                      <code>py server.py</code>). Open
+                                      <a href="http://localhost:4173/"
+                                        >localhost:4173</a
+                                      >, then try <code>/app.html</code>. Hello,
+                                      ByteBack!
+                                    </p>
+                                  </div>
+                                </li>
+                              </ol>
+                              <div class="takeaway">
+                                <span>YOU’RE READY WHEN</span>The storefront and
+                                donation app both load in your browser.
+                              </div>
+                            </div>
+                          </div>
+                          <details class="setup-detail">
+                            <summary>
+                              Copy the exact setup commands <span>+</span>
+                            </summary>
+                            <div class="detail-body">
+                              <div class="command-block">
+                                <pre><code>git clone https://github.com/ikefoxy/isaac-business-startup.git
+cd isaac-business-startup
+npm ci
+python3 -m venv .venv
+.venv/bin/python -m pip install -r requirements-dev.txt
+git config core.hooksPath .githooks
+python3 server.py</code></pre>
+                                <button class="copy-button" type="button">
+                                  Copy commands
+                                </button>
+                              </div>
+                              <p>
+                                Windows: substitute <code>py</code> for
+                                <code>python3</code> and use
+                                <code>.venv/Scripts/python</code>. Run the Git
+                                hook in Git Bash. Busy port? Set
+                                <code>PORT=4174</code> and
+                                <code>PUBLIC_URL=http://localhost:4174</code> in
+                                <code>.env</code>, restart, and open that exact
+                                URL. Use the Python server for app features;
+                                static preview tools only display pages.
+                              </p>
+                            </div>
+                          </details>
+                        </section>
+                        <section class="stage" id="workflow" data-stage>
+                          <div class="stage-layout">
+                            <div class="stage-content">
+                              <span class="eyebrow"
+                                >03 / DEVELOPMENT STRATEGY</span
+                              >
+                              <h2>One card. One small win.</h2>
+                              <p class="stage-intro">
+                                We use Kanban. You don’t need a meeting to see
+                                what happens next.
+                              </p>
+                              <ol class="action-list">
+                                <li>
+                                  <span>1</span>
+                                  <div>
+                                    <h3>Choose your quest.</h3>
+                                    <p>
+                                      Pick a Ready issue with Isaac. Make sure
+                                      it has an owner and a clear “done when…”
+                                      checklist.
+                                    </p>
+                                  </div>
+                                </li>
+                                <li>
+                                  <span>2</span>
+                                  <div>
+                                    <h3>Keep the card moving.</h3>
+                                    <p>
+                                      Work on one task at a time. Post “finished
+                                      / next / blocked” each day. Code ready?
+                                      Move the shared issue to Review.
+                                    </p>
+                                  </div>
+                                </li>
+                                <li>
+                                  <span>3</span>
+                                  <div>
+                                    <h3>Finish together.</h3>
+                                    <p>
+                                      Tests green + teammate approval + updated
+                                      docs + merged, working code = Done.
+                                      Confirm Monday planning and Friday demos
+                                      with Isaac.
+                                    </p>
+                                  </div>
+                                </li>
+                              </ol>
+                              <div class="takeaway">
+                                <span>THE FLOW</span>Backlog → Ready → In
+                                progress → Review → Done
+                              </div>
+                            </div>
+                          </div>
+                        </section>
+                        <section class="stage" id="git" data-stage>
+                          <div class="stage-layout">
+                            <div class="stage-content">
+                              <span class="eyebrow"
+                                >04 / GIT STRATEGY & CONTROLS</span
+                              >
+                              <h2>Your code needs a plus-one.</h2>
+                              <p class="stage-intro">
+                                Experiment on your branch. Invite a teammate
+                                before it joins main.
+                              </p>
+                              <ol class="action-list">
+                                <li>
+                                  <span>1</span>
+                                  <div>
+                                    <h3>Claim a branch.</h3>
+                                    <p>
+                                      Update <code>main</code>, then create
+                                      <code>feat/1-product-details</code>. Use
+                                      <code>fix/</code> or
+                                      <code>docs/</code> for fixes or docs, with
+                                      the actual issue number.
+                                    </p>
+                                  </div>
+                                </li>
+                                <li>
+                                  <span>2</span>
+                                  <div>
+                                    <h3>Leave breadcrumbs.</h3>
+                                    <p>
+                                      Try
+                                      <code
+                                        >feat(catalog): show battery
+                                        health</code
+                                      >. Open a PR, link the issue, and show
+                                      your tests and a screenshot.
+                                    </p>
+                                  </div>
+                                </li>
+                                <li>
+                                  <span>3</span>
+                                  <div>
+                                    <h3>Get a second pair of eyes.</h3>
+                                    <p>
+                                      Ask Isaac or a teammate to review. Fix
+                                      feedback, pass checks, squash merge,
+                                      delete the branch. Keep direct pushes off
+                                      main.
+                                    </p>
+                                  </div>
+                                </li>
+                              </ol>
+                              <div class="takeaway">
+                                <span>THE RULE</span>The person writing the code
+                                doesn’t approve their own change.
+                              </div>
+                            </div>
+                          </div>
+                          <details class="setup-detail">
+                            <summary>
+                              Branch commands & administrator controls
+                              <span>+</span>
+                            </summary>
+                            <div class="detail-body">
+                              <div class="command-block">
+                                <pre><code>git switch main
+git pull --ff-only
+git switch -c feat/12-search
+# Make your change and run the checks.
+git add app.js app.css
+git commit -m "feat(catalog): explain empty results"
+git push -u origin feat/12-search</code></pre>
+                                <button class="copy-button" type="button">
+                                  Copy commands
+                                </button>
+                              </div>
+                              <p>
+                                Administrator: in
+                                <a
+                                  href="https://github.com/ikefoxy/isaac-business-startup/settings/branches"
+                                  >GitHub branch settings ↗</a
+                                >, protect <code>main</code>: require a PR, one
+                                approval, dismiss stale approvals, resolve
+                                conversations, and require
+                                <code>quality</code> and
+                                <code>tests</code> checks with an up-to-date
+                                branch. Block force pushes and deletion.
+                                <strong
+                                  >These remote settings still need
+                                  activation.</strong
+                                >
+                                If working alone, record that independent review
+                                is unavailable.
+                              </p>
+                            </div>
+                          </details>
+                        </section>
+                        <section class="stage" id="issues" data-stage>
+                          <span class="eyebrow">05 / ISSUE TRACKING</span>
+                          <h2>Someone said “what if…”</h2>
+                          <p class="stage-intro">
+                            Now give that idea a card, a clear finish line, and
+                            an owner.
+                          </p>
+                          <ol class="action-list">
+                            <li>
+                              <span>1</span>
+                              <div>
+                                <h3>Give your idea a finish line.</h3>
+                                <p>
+                                  Write the problem, name an owner, and add a
+                                  “done when…” checklist. Use the repository’s
+                                  task or bug template so the next person can
+                                  jump in.
+                                </p>
+                              </div>
+                            </li>
+                            <li>
+                              <span>2</span>
+                              <div>
+                                <h3>Try your Kanban board.</h3>
+                                <p>
+                                  <a href="#kanban">Open Kanban</a>. Pick a card
+                                  and change its status to In progress. Finish
+                                  it? Move it to Done. This practice board saves
+                                  on your device.
+                                </p>
+                              </div>
+                            </li>
+                            <li>
+                              <span>3</span>
+                              <div>
+                                <h3>Keep shared work shared.</h3>
+                                <p>
+                                  Use
+                                  <a
+                                    href="https://github.com/ikefoxy/isaac-business-startup/issues"
+                                    >GitHub Issues</a
+                                  >
+                                  for team tasks. Add an owner, acceptance
+                                  checks, daily updates and a linked PR. Local
+                                  cards don’t update GitHub.
+                                </p>
+                              </div>
+                            </li>
+                          </ol>
+                          <div class="takeaway">
+                            <span>YOUR NEXT MOVE</span
+                            ><a href="#kanban">Open your Kanban board ↓</a> or
+                            <a
+                              href="https://github.com/ikefoxy/isaac-business-startup/issues"
+                              >open team issues ↗</a
+                            >.
+                          </div>
+                        </section>
+                        <section class="stage" id="ai" data-stage>
+                          <div class="stage-layout">
+                            <div class="stage-content">
+                              <span class="eyebrow"
+                                >06 / AI AGENTS & CONTROLS</span
+                              >
+                              <h2>Meet your fast-thinking sidekick.</h2>
+                              <p class="stage-intro">
+                                AI can get you unstuck. You still hold the
+                                steering wheel.
+                              </p>
+                              <ol class="action-list">
+                                <li>
+                                  <span>1</span>
+                                  <div>
+                                    <h3>Give Copilot a small job.</h3>
+                                    <p>
+                                      GitHub Copilot is the playbook’s approved
+                                      coding assistant. Ask for an explanation,
+                                      a draft or a test. Name the files and the
+                                      finish line; use fictional data.
+                                    </p>
+                                  </div>
+                                </li>
+                                <li>
+                                  <span>2</span>
+                                  <div>
+                                    <h3>Keep your secrets secret.</h3>
+                                    <p>
+                                      No donor details, database exports,
+                                      passwords, keys or cookies in prompts. AI
+                                      does not merge, deploy or buy postage on
+                                      its own.
+                                    </p>
+                                  </div>
+                                </li>
+                                <li>
+                                  <span>3</span>
+                                  <div>
+                                    <h3>Read before you accept.</h3>
+                                    <p>
+                                      Can you explain the code? Check security,
+                                      sources and licenses. Run tests, disclose
+                                      substantial AI help in the PR, and get
+                                      human review.
+                                    </p>
+                                  </div>
+                                </li>
+                              </ol>
+                              <div class="takeaway">
+                                <span>REMEMBER</span>AI can draft the work.
+                                You’re responsible for what ships.
+                              </div>
+                            </div>
+                          </div>
+                          <details class="setup-detail">
+                            <summary>
+                              Install the tool & try a good prompt
+                              <span>+</span>
+                            </summary>
+                            <div class="detail-body">
+                              <p>
+                                <a
+                                  href="https://marketplace.visualstudio.com/items?itemName=GitHub.copilot"
+                                  >Get the Copilot extension ↗</a
+                                >. Example: “In app.js, make empty catalog
+                                results clearer. Keep filtering and escaping
+                                intact. Add a reset action, use demo data, avoid
+                                new dependencies, and explain how to test on
+                                mobile and desktop.”
+                              </p>
+                              <p>
+                                Before accepting code, inspect authorization,
+                                data access, escaping, and error states.
+                                <a
+                                  href="https://docs.github.com/en/copilot/responsible-use/inline-suggestions"
+                                  >Read GitHub’s responsible-use guide ↗</a
+                                >.
+                              </p>
+                            </div>
+                          </details>
+                        </section>
+                        <section class="stage" id="quality" data-stage>
+                          <div class="stage-layout">
+                            <div class="stage-content">
+                              <span class="eyebrow">07 / CODE QUALITY</span>
+                              <h2>Catch the “oops” before launch.</h2>
+                              <p class="stage-intro">
+                                Let the tools find the boring mistakes. You get
+                                to fix the interesting ones.
+                              </p>
+                              <ol class="action-list">
+                                <li>
+                                  <span>1</span>
+                                  <div>
+                                    <h3>Give JavaScript a checkup.</h3>
+                                    <p>
+                                      <code>npm run check</code> runs ESLint 10
+                                      and Prettier 3. Formatting complaint? Run
+                                      <code>npm run format</code>, then check
+                                      again.
+                                    </p>
+                                  </div>
+                                </li>
+                                <li>
+                                  <span>2</span>
+                                  <div>
+                                    <h3>Let Ruff spot Python slips.</h3>
+                                    <p>
+                                      Run
+                                      <code>.venv/bin/ruff check .</code> for
+                                      our selected correctness rules. Follow PEP
+                                      8 when adding Python.
+                                    </p>
+                                  </div>
+                                </li>
+                                <li>
+                                  <span>3</span>
+                                  <div>
+                                    <h3>Check the locks, too.</h3>
+                                    <p>
+                                      Run
+                                      <code>npm audit --audit-level=high</code>.
+                                      CodeQL workflows run security scans
+                                      through GitHub Actions. Review alerts with
+                                      Isaac before release.
+                                    </p>
+                                  </div>
+                                </li>
+                              </ol>
+                              <div class="takeaway">
+                                <span>BEFORE EVERY PR</span>Fix failing checks.
+                                Review security alerts with Isaac before
+                                release.
+                              </div>
+                            </div>
+                          </div>
+                          <details class="setup-detail">
+                            <summary>
+                              Exact configs, commands & enforcement
+                              <span>+</span>
+                            </summary>
+                            <div class="detail-body">
+                              <div class="command-block">
+                                <pre><code>npm run check
+.venv/bin/ruff check .
+npm audit --audit-level=high
+# Fix formatting when needed:
+npm run format</code></pre>
+                                <button class="copy-button" type="button">
+                                  Copy commands
+                                </button>
+                              </div>
+                              <p>
+                                <code>eslint.config.mjs</code>: strict equality,
+                                no eval/debugger, duplicate keys, unreachable
+                                code, and typeof checks. <code>ruff.toml</code>:
+                                E9, F63, F7, F82. <code>package.json</code>:
+                                pinned tools and formatting scope; legacy
+                                storefront formatting and vendored QR code are
+                                excluded.
+                              </p>
+                              <p>
+                                <code>.githooks/pre-commit</code> runs npm
+                                checks, Ruff, and integration tests after
+                                <code>git config core.hooksPath .githooks</code
+                                >. It checks the working tree; stage your final
+                                fixes. CI repeats checks, tests, and audits.
+                                CodeQL scans on PRs, main pushes, and weekly
+                                after publication. Windows: use
+                                <code>.venv/Scripts/ruff.exe</code>. Enable
+                                secret scanning and push protection in GitHub
+                                where supported.
+                              </p>
+                            </div>
+                          </details>
+                        </section>
+                        <section class="stage" id="testing" data-stage>
+                          <div class="stage-layout">
+                            <div class="stage-content">
+                              <span class="eyebrow"
+                                >08 / TESTING FRAMEWORKS</span
+                              >
+                              <h2>Be the customer for five minutes.</h2>
+                              <p class="stage-intro">
+                                Happy path? Great. Now try the click nobody
+                                planned for.
+                              </p>
+                              <ol class="action-list">
+                                <li>
+                                  <span>1</span>
+                                  <div>
+                                    <h3>Start with the safety net.</h3>
+                                    <p>
+                                      Run
+                                      <code
+                                        >python3 -m unittest discover -s tests
+                                        -v</code
+                                      >. Python unittest tests the real HTTP
+                                      server with a temporary SQLite database.
+                                    </p>
+                                  </div>
+                                </li>
+                                <li>
+                                  <span>2</span>
+                                  <div>
+                                    <h3>Try to prove yourself wrong.</h3>
+                                    <p>
+                                      Test both “it worked” and “it was
+                                      rejected.” Fixing a bug? Add a test that
+                                      catches it next time. Get every test green
+                                      before merge.
+                                    </p>
+                                  </div>
+                                </li>
+                                <li>
+                                  <span>3</span>
+                                  <div>
+                                    <h3>Take the scenic route.</h3>
+                                    <p>
+                                      Try donate → publish → reserve → collect →
+                                      reward with fictional accounts. Check
+                                      mobile, keyboard use and console errors.
+                                      Put the results in your PR.
+                                    </p>
+                                  </div>
+                                </li>
+                              </ol>
+                              <div class="takeaway">
+                                <span>THE DEMO PATH</span>Donate → publish →
+                                reserve → collect → verify the donor reward.
+                              </div>
+                            </div>
+                          </div>
+                          <details class="setup-detail">
+                            <summary>
+                              Your first test walkthrough <span>+</span>
+                            </summary>
+                            <div class="detail-body">
+                              <p>
+                                Use fictional <code>donor@example.com</code> and
+                                <code>student@example.com</code> accounts.
+                                Donate a laptop, sign in with the demo link, and
+                                submit. Use Classroom demo controls to advance
+                                through refurbishment and publish with sample
+                                specs. Switch accounts, reserve, and simulate
+                                collection. Return to the donor and confirm the
+                                $20 reward. Also cancel a reservation and verify
+                                restocking.
+                              </p>
+                              <p>
+                                The automated suite covers authentication,
+                                account isolation, CSRF/origin controls,
+                                validation, competing reservations, pricing, and
+                                rewards. Browser checks are manual; there is no
+                                committed Playwright suite. Demo controls
+                                simulate physical processing.
+                              </p>
+                            </div>
+                          </details>
+                        </section>
+                        <section class="stage" id="operations" data-stage>
+                          <div class="stage-layout">
+                            <div class="stage-content">
+                              <span class="eyebrow"
+                                >09 / OTHER CONTROLS, TOOLS & PROCEDURES</span
+                              >
+                              <h2>Good work. Now land it safely.</h2>
+                              <p class="stage-intro">
+                                A smooth launch needs protected data and a plan
+                                for the unexpected.
+                              </p>
+                              <ol class="action-list">
+                                <li>
+                                  <span>1</span>
+                                  <div>
+                                    <h3>Put the keys away.</h3>
+                                    <p>
+                                      Local secrets go in ignored
+                                      <code>.env</code>; live secrets go in
+                                      protected host settings. Never commit
+                                      donor data. Exposed key? Rotate it and
+                                      tell Isaac.
+                                    </p>
+                                  </div>
+                                </li>
+                                <li>
+                                  <span>2</span>
+                                  <div>
+                                    <h3>Run the landing checklist.</h3>
+                                    <p>
+                                      Pass checks, back up SQLite, stage behind
+                                      HTTPS, and try sign-in, roles and
+                                      receipts. Keep demo and live databases
+                                      separate. Agree hosting with Isaac.
+                                    </p>
+                                  </div>
+                                </li>
+                                <li>
+                                  <span>3</span>
+                                  <div>
+                                    <h3>Know who to call.</h3>
+                                    <p>
+                                      Something breaks? Pause the affected
+                                      operation, contact Isaac in your agreed
+                                      channel, and record sanitized errors.
+                                      Restore carefully and write down the fix.
+                                    </p>
+                                  </div>
+                                </li>
+                              </ol>
+                              <div class="takeaway">
+                                <span>YOUR FIRST-DAY CHECK</span>Confirm
+                                repository access, your contact channel, and
+                                your first issue with Isaac.
+                              </div>
+                            </div>
+                          </div>
+                          <details class="setup-detail">
+                            <summary>
+                              Live setup, backups & publishing <span>+</span>
+                            </summary>
+                            <div class="detail-body">
+                              <p>
+                                <strong>Live configuration:</strong> copy
+                                <code>.env.example</code>; set
+                                <code>BYTEBACK_MODE=live</code>, HTTPS
+                                <code>PUBLIC_URL</code>, separate
+                                <code>BYTEBACK_DB</code>, SMTP settings,
+                                <code>ADMIN_EMAILS</code>, and verified
+                                <code>DROPOFF_DESCRIPTION</code>. The bundled
+                                server is a pilot implementation; approve
+                                hosting before launch.
+                              </p>
+                              <p>
+                                <strong>Shipping:</strong> set
+                                <code>EASYPOST_API_KEY</code>,
+                                <code>SHIP_TO_JSON</code>, and
+                                <code>MAX_LABEL_USD</code>. Test with an
+                                EasyPost test key first. Only Isaac enables paid
+                                labels; refunds/voids are handled outside the
+                                app.
+                              </p>
+                              <p>
+                                <strong>Recovery:</strong> schedule encrypted
+                                daily SQLite backups via its backup API or CLI
+                                <code>.backup</code>; restrict access and test
+                                restoration. To roll back, pause writes and
+                                restore approved code. Review database
+                                compatibility and newer orders before restoring
+                                data. There is no formal on-call rota yet;
+                                define one before launch.
+                              </p>
+                              <p>
+                                <strong>Assignment submission:</strong> publish
+                                these files through your static host or GitHub
+                                Pages (main / root), verify the public
+                                <code>/playbook.html</code> URL while signed
+                                out, and submit that link. Static hosting runs
+                                this guide, not the Python backend.
+                              </p>
+                            </div>
+                          </details>
+                        </section>
+                      </div>
+                      <div class="slide-footer">
+                        <button
+                          type="button"
+                          id="previous-stage"
+                          class="nav-button"
+                        >
+                          <span aria-hidden="true">←</span> Previous</button
+                        ><button
+                          type="button"
+                          id="complete-stage"
+                          class="complete-button"
+                          aria-pressed="false"
+                        >
+                          <span class="check-icon" aria-hidden="true">✓</span
+                          ><span id="complete-label"
+                            >Got it. Check this off.</span
+                          ></button
+                        ><button
+                          type="button"
+                          id="next-stage"
+                          class="nav-button next"
+                        >
+                          Next mission <span aria-hidden="true">→</span>
+                        </button>
+                      </div>
+                    </div>
+                    <p class="guide-hint">
+                      <span>Need the exact command? Pop open the details.</span
+                      ><span
+                        id="slide-announcement"
+                        class="sr-only"
+                        role="status"
+                      ></span
+                      ><span
+                        >← → to navigate · Progress saved on this device</span
+                      >
+                    </p>
+                  </section>
+                </div>
+                <aside class="kanban-app">
+                  <section
+                    class="kanban-section"
+                    id="kanban"
+                    aria-labelledby="kanban-title"
+                  >
+                    <div class="board-heading">
+                      <div>
+                        <span class="eyebrow"
+                          >KANBAN / YOUR WORK IN MOTION</span
+                        >
+                        <h2 id="kanban-title">Your ByteBack Kanban board.</h2>
+                      </div>
+                      <a
+                        class="secondary-button"
+                        href="https://github.com/ikefoxy/isaac-business-startup/issues"
+                        >Team issues ↗</a
+                      >
+                    </div>
+                    <p class="board-intro">
+                      Your Kanban board. Pick one card, start it, finish it.
+                      That’s the whole game.
+                    </p>
+                    <form id="add-task-form" class="add-task-form">
+                      <label class="sr-only" for="new-task"
+                        >New task title</label
+                      ><input
+                        id="new-task"
+                        name="task"
+                        maxlength="100"
+                        required
+                        placeholder="Add your next task…"
+                      /><button type="submit">+ Add task</button>
+                    </form>
+                    <div class="board" id="kanban-board"></div>
+                    <p id="board-status" class="small-note" role="status">
+                      Personal board · saved on this device. Shared team work
+                      lives in GitHub Issues.
+                    </p>
+                  </section>
+                </aside>
+                <div class="board-feedback feedback-app">
+                  <span class="eyebrow"
+                    >FROM THE PEOPLE WHO TRIED BYTEBACK</span
+                  >
+                  <h2 id="feedback-title" tabindex="-1">
+                    You listened. Here’s what happens next.
+                  </h2>
+                  <a
+                    href="https://github.com/ikefoxy/isaac-business-startup/issues/1"
+                    >Jared → Battery, condition, accessories ↗</a
+                  ><a
+                    href="https://github.com/ikefoxy/isaac-business-startup/issues/2"
+                    >Joe → Make the next click obvious ↗</a
+                  ><a
+                    href="https://github.com/ikefoxy/isaac-business-startup/issues/3"
+                    >Katrina → $179 − $20 = $159 due ↗</a
+                  ><a
+                    href="https://github.com/ikefoxy/isaac-business-startup/issues/4"
+                    >Cory → Who donates? What happens next? ↗</a
+                  >
+                  <p>
+                    These open GitHub requests are separate from your personal
+                    practice cards.
+                  </p>
+                </div>
+              </div>
+              <div class="os-status">
+                <span>● Progress saved on this device</span
+                ><span>Small steps. Useful work. That’s ByteBack.</span
+                ><span id="workspace-toast" role="status"></span>
+              </div>
+            </div>
+          </div>
+          <div class="computer-chin"><span>byteback.</span></div>
+        </div>
+        <div class="computer-base" aria-hidden="true"></div>
+      </div>
+      <footer>
+        <a class="footer-brand" href="index.html">byteback.</a
+        ><span>All 9 assignment areas · Isaac Fox · October 2026</span
+        ><span>Concept wallpaper created with AI</span>
+      </footer>
+    </main>
+    <noscript
+      ><p class="noscript-message">
+        JavaScript is off: all nine stages are available below. Enable it for
+        sign-in and the practice board.
+      </p></noscript
+    >
+  </body>
+</html>

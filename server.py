@@ -216,7 +216,7 @@ class Handler(SimpleHTTPRequestHandler):
         path = urlsplit(self.path).path
         if path.startswith('/api/'):
             return self.dispatch('GET', path)
-        allowed = {'/', '/index.html', '/app.html', '/styles.css', '/brand.css', '/store.css', '/store.js', '/shop.js', '/catalog-data.json', '/image-credits.html', '/script.js', '/app.css', '/app.js', '/qr.js'}
+        allowed = {'/', '/index.html', '/app.html', '/styles.css', '/brand.css', '/store.css', '/store.js', '/shop.js', '/catalog-data.json', '/image-credits.html', '/playbook.html', '/playbook.css', '/playbook.js', '/script.js', '/app.css', '/app.js', '/qr.js'}
         # Explicit allowlist: never serve .env, SQLite, source files, or .git.
         if path not in allowed and path not in {'/assets/' + p.name for p in (ROOT / 'assets').iterdir() if p.is_file()}:
             return self.send_error(404)
@@ -224,7 +224,7 @@ class Handler(SimpleHTTPRequestHandler):
 
     def do_HEAD(self):
         path = urlsplit(self.path).path
-        allowed = {'/', '/index.html', '/app.html', '/styles.css', '/brand.css', '/store.css', '/store.js', '/shop.js', '/catalog-data.json', '/image-credits.html', '/script.js', '/app.css', '/app.js', '/qr.js'}
+        allowed = {'/', '/index.html', '/app.html', '/styles.css', '/brand.css', '/store.css', '/store.js', '/shop.js', '/catalog-data.json', '/image-credits.html', '/playbook.html', '/playbook.css', '/playbook.js', '/script.js', '/app.css', '/app.js', '/qr.js'}
         if path not in allowed and path not in {'/assets/' + p.name for p in (ROOT / 'assets').iterdir() if p.is_file()}:
             return self.send_error(404)
         super().do_HEAD()

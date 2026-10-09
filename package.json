@@ -1,0 +1,17 @@
+{
+  "name": "byteback-playbook",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Development checks for ByteBack; the application runs with Python only.",
+  "scripts": {
+    "lint": "eslint app.js shop.js store.js playbook.js",
+    "format:check": "prettier --check playbook.html playbook.css playbook.js eslint.config.mjs package.json",
+    "format": "prettier --write playbook.html playbook.css playbook.js eslint.config.mjs package.json",
+    "check": "npm run lint && npm run format:check",
+    "test": "python3 -m unittest discover -s tests -v"
+  },
+  "devDependencies": {
+    "eslint": "10.12.0",
+    "prettier": "3.6.2"
+  }
+}

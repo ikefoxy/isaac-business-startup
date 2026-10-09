@@ -434,3 +434,8 @@ FodyWeavers.xsd
 __pycache__/
 *.pyc
 test-results/
+
+# Development tooling
+node_modules/
+.venv/
+.ruff_cache/

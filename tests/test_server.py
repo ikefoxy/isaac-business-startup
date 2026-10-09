@@ -91,7 +91,7 @@ class MVPTests(unittest.TestCase):
     def test_private_files_are_never_served(self):
         for path in ['/.env', '/.data/byteback.sqlite3', '/server.py', '/.git/config', '/assets/../server.py', '/%2eenv']:
             self.assertEqual(self.alice.request('GET', path)[0], 404, path)
-        for path in ['/', '/app.html', '/app.js', '/app.css']:
+        for path in ['/', '/app.html', '/app.js', '/app.css', '/playbook.html', '/playbook.css', '/playbook.js']:
             self.assertEqual(self.alice.request('GET', path)[0], 200, path)
 
     def test_validation_and_idempotency(self):
