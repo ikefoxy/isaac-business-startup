@@ -110,6 +110,31 @@ def mail(email, subject, body):
     return status
 
 
+def reservation_quote(db, user, item, code):
+    require(item, 'This computer was just reserved. Please choose another.', 409)
+    require(item['source'] not in [r[0] for r in db.execute('SELECT id FROM orders WHERE email=?', (user['email'],))], 'Choose a computer donated by someone else.')
+    code = str(code or '').strip().upper()
+    discount = 0
+    if code:
+        reward = db.execute("SELECT * FROM rewards WHERE code=? AND state='available'", (code,)).fetchone()
+        require(reward and (reward['email'] == user['email'] if reward['choice'] == 'keep' else reward['email'] != user['email']), 'This reward code is not available for this account.')
+        require(item['price'] > 0, 'This computer is already free. Save your reward for a priced computer.')
+        discount = min(reward['amount'], item['price'])
+    return {'original_price': item['price'], 'discount': discount, 'price': item['price'] - discount, 'reward_code': code}
+
+
+def listing_inspection(listing, device):
+    condition = listing.get('condition', 'Not recorded')
+    require(condition in ['Excellent', 'Good', 'Fair', 'Not recorded'], 'Choose a valid inspected condition.')
+    battery = listing.get('battery_health')
+    require(battery is None or (type(battery) is int and 0 <= battery <= 100), 'Battery health must be a whole percentage from 0 to 100, or left blank.')
+    desktop = device['type'] == 'Desktop'
+    require(not desktop or battery is None, 'Leave battery health blank for desktops.')
+    return {'condition': condition, 'notes': str(listing.get('condition_notes', '')).strip()[:350],
+            'battery_health': battery, 'battery_status': 'Not applicable (desktop)' if desktop else 'Not measured' if battery is None else 'Measured capacity vs. design capacity',
+            'accessories': str(listing.get('accessories', '')).strip()[:500] or 'Not recorded'}
+
+
 def receipt(order):
     d = order['data']
     items = ', '.join(x['model'] for x in d.get('devices', [])) or d.get('item_name', '')
@@ -117,6 +142,7 @@ def receipt(order):
             f"Receipt: {order['id']}\nStatus: {order['status']}\nDevices: {items}\n"
             f"Method: {d.get('method', 'Campus pickup')}\n"
             f"Location: {DROP}\n"
+            f"Original price: ${d.get('original_price', d.get('price', 0))}\n"
             f"Amount due at pickup: ${d.get('price', 0)}\n"
             f"ByteBack reward applied: ${d.get('discount', 0)}\n"
             f"Pickup pass: {d.get('pass', 'Not applicable')}\n"
@@ -278,6 +304,10 @@ class Handler(SimpleHTTPRequestHandler):
                         d = json.loads(donor['data'])
                         item['student_note'] = d.get('student_note', '')
                         item['donor_name'] = d.get('first_name', '') or 'A fellow student'
+                        index = int(item['id'].rsplit('-', 1)[1])
+                        listings = d.get('listings', [])
+                        item['inspection'] = listings[index].get('inspection', {}) if index < len(listings) else {}
+
                 return {'items': items}
         if method == 'POST' and path == '/api/auth/request':
             self.rate_limit('login-ip:' + self.client_address[0], 30)
@@ -319,6 +349,10 @@ class Handler(SimpleHTTPRequestHandler):
         if path == '/api/rewards' and method == 'GET':
             with connect() as db:
                 return {'rewards': [dict(r) for r in db.execute('SELECT * FROM rewards WHERE email=? ORDER BY created DESC', (user['email'],))]}
+        if path == '/api/reservation-quote' and method == 'POST':
+            with connect() as db:
+                item = db.execute("SELECT * FROM inventory WHERE id=? AND state='available' AND (? OR id NOT LIKE 'demo-%')", (str(data.get('item_id', '')), DEMO)).fetchone()
+                return reservation_quote(db, user, item, data.get('reward_code', ''))
         if path == '/api/orders' and method == 'GET':
             with connect() as db:
                 return {'orders': [unpack(r) for r in db.execute('SELECT * FROM orders WHERE email=? ORDER BY created DESC', (user['email'],))]}
@@ -361,14 +395,17 @@ class Handler(SimpleHTTPRequestHandler):
                     if order['status'] == 'Ready for student':
                         listings = data.get('listings', [{} for _ in d['devices']])
                         require(isinstance(listings, list) and len(listings) == len(d['devices']), 'Add listing details for each device.')
+                        verified_listings = []
                         for i, device in enumerate(d['devices']):
                             listing = listings[i]
                             require(isinstance(listing, dict), 'Check the listing details.')
                             price = listing.get('price', 0)
                             require(type(price) is int and 0 <= price <= 500, 'Enter a whole-dollar student price from $0 to $500.')
                             specs = str(listing.get('specs', '')).strip()[:300] or device['type'] + ' · Refurbished · Inspected and data wiped'
+                            verified_listings.append({'inspection': listing_inspection(listing, device)})
                             db.execute('INSERT OR IGNORE INTO inventory VALUES (?,?,?,?,?,?)',
                                        (order_id + '-' + str(i), device['model'], specs, price, order_id, 'available'))
+                        d['listings'] = verified_listings
                 else:
                     order['status'] = 'Collected'
                     db.execute("UPDATE rewards SET state='used' WHERE reservation=? AND state='held'", (order_id,))
@@ -477,18 +514,13 @@ class Handler(SimpleHTTPRequestHandler):
                 status = 'Submitted'
             else:
                 item = db.execute("SELECT * FROM inventory WHERE id=? AND state='available' AND (? OR id NOT LIKE 'demo-%')", (str(data.get('item_id', '')), DEMO)).fetchone()
-                require(item, 'This computer was just reserved. Please choose another.', 409)
-                require(item['source'] not in [r[0] for r in db.execute('SELECT id FROM orders WHERE email=?', (user['email'],))], 'Choose a computer donated by someone else.')
+                quote = reservation_quote(db, user, item, data.get('reward_code', ''))
                 require(data.get('student') is True, 'Confirm you are a Provo-area college student.')
-                d.update({'item_id': item['id'], 'item_name': item['name'], 'price': item['price'], 'pass': uid('PICK'), 'method': 'Campus pickup'})
-                code = str(data.get('reward_code', '')).strip().upper()
-                if code:
-                    reward = db.execute("SELECT * FROM rewards WHERE code=? AND state='available'", (code,)).fetchone()
-                    require(reward and (reward['email'] == user['email'] if reward['choice'] == 'keep' else reward['email'] != user['email']), 'This reward code is not available for this account.')
-                    require(item['price'] > 0, 'This computer is already free. Save your reward for a priced computer.')
-                    discount = min(reward['amount'], item['price'])
-                    d.update({'discount': discount, 'original_price': item['price'], 'price': item['price'] - discount, 'reward_code': code})
-                    db.execute("UPDATE rewards SET state='held', reservation=? WHERE code=?", (order_id, code))
+                if 'quoted_price' in data:
+                    require(type(data['quoted_price']) is int and data['quoted_price'] == quote['price'], 'Your price or reward changed. Close this dialog and check your total again.', 409)
+                d.update({'item_id': item['id'], 'item_name': item['name'], 'pass': uid('PICK'), 'method': 'Campus pickup', **quote})
+                if quote['reward_code']:
+                    db.execute("UPDATE rewards SET state='held', reservation=? WHERE code=?", (order_id, quote['reward_code']))
                 db.execute("UPDATE inventory SET state='reserved' WHERE id=?", (item['id'],))
                 status = 'Reserved'
             order = {'id': order_id, 'email': user['email'], 'kind': kind, 'status': status, 'data': d, 'created': time.time()}

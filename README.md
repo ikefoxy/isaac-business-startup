@@ -79,7 +79,7 @@ node --check shop.js
 node --check store.js
 ```
 
-The 14 tests cover storefront metadata, reservation persistence across catalog reseeding, single-use authentication, unauthorized access, CSRF, origin validation, private-file protection, invalid donations/addresses, idempotent submissions, competing reservations, cancellation/restocking, order editing, mock labels and receipts, live role enforcement, and the full donation → catalog → reservation → collection → donor-reward lifecycle, personal/gift-code access, discount application, cancellation restoration, and organizer pricing. Tests use a temporary database and never alter your app data.
+The 18 tests cover storefront metadata, reservation persistence across catalog reseeding, single-use authentication, unauthorized access, CSRF, origin validation, private-file protection, invalid donations/addresses, idempotent submissions, competing reservations, cancellation/restocking, order editing, mock labels and receipts, live role enforcement, and the full donation → catalog → reservation → collection → donor-reward lifecycle, personal/gift-code access, discount application, cancellation restoration, and organizer pricing. Tests use a temporary database and never alter your app data.
 
 Browser checks exercised featured slides, purpose recommendations, homepage search, combined catalog filters, empty results, persistent filter/sort URLs, product deep links, sign-in to reservation, donation, cancellation, reload persistence, QR rendering, and screen widths of 320, 375, 768, and 1440 pixels. The new desktop/mobile homepage, filtered catalog, and blue donation screen had no automated WCAG 2 A/AA or WCAG 2.1 AA violations. Automated checks do not constitute accessibility certification.
 
@@ -118,10 +118,21 @@ Assignment page: **https://ikefoxy.github.io/isaac-business-startup/playbook.htm
 
 ### Participant feedback and first-day demo
 
-The October 9 feedback from Jared, Joe, Katrina, and Cory is archived in [docs/participant-feedback-2026-10-09.md](docs/participant-feedback-2026-10-09.md) with the four published GitHub issue links. The separate Team feedback screen links directly to these real tasks. They are requested improvements, not completed storefront changes.
+The October 9 feedback from Jared, Joe, Katrina, and Cory is archived in [docs/participant-feedback-2026-10-09.md](docs/participant-feedback-2026-10-09.md) with the four published GitHub issue links. The separate Team feedback screen links directly to these real tasks. Their requested improvements are now implemented; see the October 29 implementation notes below.
 
 The playbook’s computer simulation accepts an optional first name, animates a short boot sequence, and opens workspace shortcuts. The name is kept in memory for the visit; no authentication, network request, or account creation occurs. Skip and replay controls are available; reduced-motion preference bypasses the sequence. The exact setup commands and all nine assignment categories remain in the guide.
 
 ### Interactive ByteBack desktop
 
 Open `playbook.html` for the first-day simulation: enter an optional first name, watch the illustrated teammate type during startup, then use the real roadmap and Kanban inside the computer. The new-hire playbook and Kanban have separate app screens on desktop and mobile. The wallpaper remains visible around translucent app panels. Participant feedback has a third, independent screen with its real GitHub issue links. All nine stages keep exact setup/configuration details in expandable panels. Names are not saved; a session flag remembers the simulated sign-in. Roadmap completion and personal task status remain in local storage, separate from the four real participant-feedback GitHub issues. Reduced-motion skips startup animation, and printing includes all nine stages with their details.
+
+## Participant feedback implemented — October 29, 2026
+
+- Jared: click a product image, title or **View details** to see battery health, condition, wear notes and included accessories. Demo values are labeled as sample inspection data. Organizer publication records actual inspection fields; missing legacy measurements remain unknown.
+- Joe: donation step one explains exactly how to add and save each device; reservation sign-in names the selected computer and returns to its confirmation dialog. The catalog has less space above results, with existing filters retained.
+- Katrina: the reservation dialog, confirmation, dashboard and receipts show original price, applied reward and amount due at pickup. **Apply reward** validates the code on the server before confirmation. Confirmation checks the displayed total again; changed codes require reapplying.
+- Cory: a visible home-page guide and expandable donation guide explain who can donate, preparation/handoff, and inspection. Existing separate shopping and donation paths are retained.
+
+The static GitHub Pages preview supports browsing sample product details and reading/drafting the donation steps. Accounts, server-verified reward totals, orders and organizer publication require `python3 server.py`. The local app is **http://localhost:4173/** (store) and **http://localhost:4173/app.html#catalog** (catalog). No credentials or local order data are committed.
+
+Verification: 18 HTTP/SQLite tests, including quote permissions, invalid/held rewards, capped/free pricing, changed-total rejection, inspection persistence and unknown legacy fields. Browser checks cover product details, reservation sign-in return, a $179 − $20 = $159 reservation, donation guidance, and responsive layouts.

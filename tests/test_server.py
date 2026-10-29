@@ -240,6 +240,65 @@ class MVPTests(unittest.TestCase):
         self.assertEqual(item['price'],79)
         self.assertEqual(item['specs'],'8 GB RAM · 256 GB SSD · Linux Mint')
 
+
+    def test_reward_quote_matches_confirmation_and_does_not_hold_credit(self):
+        code = self.earn_reward()
+        for body, expected in [({'item_id':'demo-dell'}, 200), ({'item_id':'demo-dell','reward_code':'INVALID'}, 400)]:
+            self.assertEqual(self.alice.request('POST','/api/reservation-quote',body)[0], expected)
+        status, quote = self.alice.request('POST','/api/reservation-quote',{'item_id':'demo-dell','reward_code':code})
+        self.assertEqual(status,200)
+        self.assertEqual(quote['original_price'] - quote['discount'], quote['price'])
+        self.assertEqual(quote['discount'],20)
+        self.assertEqual(self.alice.request('GET','/api/rewards')[1]['rewards'][0]['state'],'available')
+        payload={'kind':'reservation','request_key':'quoted-reservation-123','item_id':'demo-dell','reward_code':code,'student':True,'quoted_price':quote['price']+1}
+        self.assertEqual(self.alice.request('POST','/api/orders',payload)[0],409)
+        status, result = self.alice.request('POST','/api/orders',{**payload,'quoted_price':quote['price']})
+        self.assertEqual(status,200)
+        for field in ['original_price','discount','price']:
+            self.assertEqual(result['order']['data'][field],quote[field])
+        self.assertEqual(self.alice.request('POST','/api/reservation-quote',{'item_id':'demo-asus','reward_code':code})[0],400)
+        self.assertEqual(Client(self.port).request('POST','/api/reservation-quote',{'item_id':'demo-asus'})[0],401)
+        self.assertEqual(self.alice.request('POST','/api/reservation-quote',{'item_id':'demo-asus'},**{'X-CSRF-Token':'wrong'})[0],403)
+
+    def test_reward_quote_caps_discount_and_rejects_free_devices(self):
+        code=self.earn_reward()
+        with server.connect() as db:
+            db.execute("UPDATE inventory SET price=10 WHERE id='demo-dell'")
+            db.execute("UPDATE inventory SET price=0 WHERE id='demo-asus'")
+        status,quote=self.alice.request('POST','/api/reservation-quote',{'item_id':'demo-dell','reward_code':code})
+        self.assertEqual(status,200)
+        self.assertEqual((quote['original_price'],quote['discount'],quote['price']),(10,10,0))
+        self.assertEqual(self.alice.request('POST','/api/reservation-quote',{'item_id':'demo-asus','reward_code':code})[0],400)
+        status,quote=self.alice.request('POST','/api/reservation-quote',{'item_id':'demo-asus'})
+        self.assertEqual((status,quote['price']),(200,0))
+
+    def test_gift_quote_respects_recipient_permissions(self):
+        gift=self.earn_reward('gift')
+        self.assertEqual(self.alice.request('POST','/api/reservation-quote',{'item_id':'demo-dell','reward_code':gift})[0],400)
+        self.assertEqual(self.bob.request('POST','/api/reservation-quote',{'item_id':'demo-dell','reward_code':gift})[0],200)
+
+    def test_recorded_inspection_survives_publication_and_legacy_is_unknown(self):
+        order=self.donation()[1]['order']; path='/api/orders/'+order['id']+'/advance'
+        for _ in range(3):
+            self.assertEqual(self.alice.request('POST',path,{})[0],200)
+        inspection={'specs':'8 GB RAM · Linux Mint','price':179,'condition':'Fair','condition_notes':'Small scratches on lid; keyboard tested.','battery_health':84,'accessories':'65W charger; no mouse'}
+        self.assertEqual(self.alice.request('POST',path,{'listings':[{**inspection,'battery_health':101}]})[0],400)
+        self.assertEqual(self.alice.request('POST',path,{'listings':[{**inspection,'battery_health':True}]})[0],400)
+        self.assertEqual(self.alice.request('POST',path,{'listings':[inspection]})[0],200)
+        item=next(p for p in self.bob.request('GET','/api/catalog')[1]['items'] if p['source']==order['id'])
+        self.assertEqual(item['inspection']['battery_health'],84)
+        self.assertEqual(item['inspection']['condition'],'Fair')
+        self.assertEqual(item['inspection']['accessories'],'65W charger; no mouse')
+        self.assertIn('Small scratches',item['inspection']['notes'])
+        # Legacy callers may publish without inspection fields, but never imply a measurement.
+        legacy=self.donation(request_key='legacy-inspection-123')[1]['order']
+        for _ in range(4):
+            self.assertEqual(self.alice.request('POST','/api/orders/'+legacy['id']+'/advance',{})[0],200)
+        unknown=next(p for p in self.bob.request('GET','/api/catalog')[1]['items'] if p['source']==legacy['id'])
+        self.assertIsNone(unknown['inspection']['battery_health'])
+        self.assertEqual(unknown['inspection']['condition'],'Not recorded')
+
+
     def test_carrier_purchase_timeout_reuses_shipment(self):
         address = {'name':'Alice','street1':'123 Test Lane','city':'Provo','state':'UT','zip':'84601'}
         parcel = {'length':16,'width':12,'height':4,'weight':80}

@@ -1,6 +1,6 @@
 # Participant feedback — October 9, 2026
 
-Source: feedback provided by Isaac Fox. These are requested improvements, not completed features.
+Source: feedback provided by Isaac Fox on October 9. The original requests below were implemented on October 29; see the implementation update at the end.
 
 ## Jared
 
@@ -92,3 +92,14 @@ Add short, specific guidance to the donation entry point and relevant steps, whi
 A first-time visitor can answer “Can I donate?”, “How do I hand it over?”, and “What happens to it?” before submitting. Compare the copy against the organizer’s confirmed process and the app’s actual stages.
 
 Source: participant feedback supplied by Isaac Fox on October 9, 2026.
+
+## Implementation update — October 29, 2026
+
+The original feedback above has been implemented in the shopping/donation site:
+
+- #1: accessible device detail dialog, sample inspection records, and organizer-verified battery/condition/accessory fields.
+- #2: explicit add-device instructions, contextual reservation sign-in, and compact catalog spacing.
+- #3: server-verified reward quote with original/discount/due rows before and after reservation, plus changed-total protection.
+- #4: donor eligibility, handoff preparation and inspection explanations on the home page and donation flow.
+
+The GitHub issues retain the original feedback for traceability. Sample inspection values do not represent physically inspected hardware. The 18-test suite covers backend behavior; browser QA verified the $179 − $20 = $159 flow and preserved navigation.

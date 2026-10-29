@@ -1809,3 +1809,36 @@
   }
 
 }
+
+/* Participant feedback: clear donation guidance, compact results, inspected details. */
+.donation-guide { border:1px solid #cad9e9; background:#edf4fc; border-radius:12px; margin:0 0 25px; padding:15px 20px; }
+.donation-guide summary { font-size:13px; font-weight:700; cursor:pointer; color:#173d6b; }
+.donation-guide-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:24px; margin-top:20px; }
+.donation-guide-grid article>span { font-size:8px; font-weight:800; letter-spacing:1px; color:#3971a9; }
+.donation-guide-grid h3 { font-size:15px; margin:7px 0; }
+.donation-guide-grid p { font-size:12px; line-height:1.8; margin:0; }
+.catalog-route .app-container { margin-top:24px; }
+.catalog-route .app-intro { margin-bottom:16px; }
+.catalog-route .app-intro h1 { font-size:32px; margin-bottom:8px; }
+.catalog-route .catalog-search { margin:14px 0 12px; }
+.catalog-route .filter-summary { margin:12px 0; }
+.catalog-route .catalog-grid { margin-top:0; }
+.inspection-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:20px 0; }
+.inspection-grid>div { padding:14px; background:#edf3fa; border:1px solid #d6e2ef; border-radius:9px; }
+.inspection-grid dt { color:#587394; font-size:10px; font-weight:700; margin-bottom:5px; }
+.inspection-grid dd { font-size:13px; font-weight:600; margin:0; overflow-wrap:anywhere; }
+.detail-product-photo { display:block; width:100%; height:210px; object-fit:contain; border-radius:12px; background:#e8eff7; margin-bottom:18px; }
+.detail-reserve { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin:20px 0 12px; }
+.detail-reserve strong { font-size:19px; color:#143e70; }
+.price-breakdown { background:#edf4fb; border:1px solid #cddff0; border-radius:10px; padding:14px 18px; margin:18px 0; }
+.price-breakdown>div { display:flex; justify-content:space-between; gap:15px; padding:5px 0; font-size:13px; }
+.price-breakdown dd { margin:0; font-weight:700; white-space:nowrap; }
+.price-breakdown .price-total { border-top:1px solid #c4d7e9; margin-top:8px; padding-top:12px; color:#153f71; font-size:17px; font-weight:800; }
+.workspace .product-buy { flex-wrap:wrap; gap:10px; }
+.workspace .product-details-button { font-size:11px; }
+.workspace .product-card h3 a { text-decoration:none; }
+.workspace .product-card h3 a:hover { text-decoration:underline; }
+#reward-status { margin:10px 0 0; }
+#apply-reward { margin:0 0 4px; }
+@media(max-width:720px) { .donation-guide-grid { grid-template-columns:1fr; gap:18px; } .catalog-route .app-intro h1 { font-size:27px; } }
+@media(max-width:420px) { .inspection-grid { grid-template-columns:1fr; } .donation-guide { padding:14px; } .detail-reserve { align-items:stretch; flex-direction:column; } .catalog-route .app-container { margin-top:18px; } }

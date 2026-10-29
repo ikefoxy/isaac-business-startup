@@ -17,7 +17,14 @@
       "Everyday study",
       "Creative work"
     ],
-    "reason": "A portable option for notes, presentations, and everyday coursework."
+    "reason": "A portable option for notes, presentations, and everyday coursework.",
+    "inspection": {
+      "condition": "Fair",
+      "notes": "Sample inspection: visible case scratches; screen and controls checked.",
+      "battery_health": 88,
+      "battery_status": "Measured capacity vs. design capacity",
+      "accessories": "Compatible charger included; no other accessories."
+    }
   },
   {
     "id": "demo-thinkpad",
@@ -37,7 +44,14 @@
       "Everyday study",
       "Coding"
     ],
-    "reason": "The lowest-priced laptop in our sample collection, with Linux Mint installed."
+    "reason": "The lowest-priced laptop in our sample collection, with Linux Mint installed.",
+    "inspection": {
+      "condition": "Good",
+      "notes": "Sample inspection: light case wear; screen and controls checked.",
+      "battery_health": 82,
+      "battery_status": "Measured capacity vs. design capacity",
+      "accessories": "Compatible charger included; no other accessories."
+    }
   },
   {
     "id": "demo-dell",
@@ -57,7 +71,14 @@
       "Everyday study",
       "Coding"
     ],
-    "reason": "16 GB of memory for browser tabs, documents, and class projects."
+    "reason": "16 GB of memory for browser tabs, documents, and class projects.",
+    "inspection": {
+      "condition": "Good",
+      "notes": "Sample inspection: light case wear; screen and controls checked.",
+      "battery_health": 86,
+      "battery_status": "Measured capacity vs. design capacity",
+      "accessories": "Compatible charger included; no other accessories."
+    }
   },
   {
     "id": "demo-thinkpad-amd",
@@ -77,7 +98,14 @@
       "Coding",
       "Everyday study"
     ],
-    "reason": "An AMD-based Linux option with room for development tools and projects."
+    "reason": "An AMD-based Linux option with room for development tools and projects.",
+    "inspection": {
+      "condition": "Fair",
+      "notes": "Sample inspection: visible case scratches; screen and controls checked.",
+      "battery_health": 91,
+      "battery_status": "Measured capacity vs. design capacity",
+      "accessories": "Compatible charger included; no other accessories."
+    }
   },
   {
     "id": "demo-hp",
@@ -97,7 +125,14 @@
       "Everyday study",
       "Coding"
     ],
-    "reason": "A larger display for spreadsheets, research, and side-by-side windows."
+    "reason": "A larger display for spreadsheets, research, and side-by-side windows.",
+    "inspection": {
+      "condition": "Good",
+      "notes": "Sample inspection: light case wear; screen and controls checked.",
+      "battery_health": 84,
+      "battery_status": "Measured capacity vs. design capacity",
+      "accessories": "Compatible charger included; no other accessories."
+    }
   },
   {
     "id": "demo-asus",
@@ -117,7 +152,14 @@
       "Creative work",
       "Coding"
     ],
-    "reason": "A dedicated NVIDIA graphics option. Check your course software requirements before choosing."
+    "reason": "A dedicated NVIDIA graphics option. Check your course software requirements before choosing.",
+    "inspection": {
+      "condition": "Good",
+      "notes": "Sample inspection: light case wear; screen and controls checked.",
+      "battery_health": 88,
+      "battery_status": "Measured capacity vs. design capacity",
+      "accessories": "Compatible charger included; no other accessories."
+    }
   },
   {
     "id": "demo-surface",
@@ -136,7 +178,14 @@
     "uses": [
       "Everyday study"
     ],
-    "reason": "A compact Windows laptop for writing, reading, and taking to class."
+    "reason": "A compact Windows laptop for writing, reading, and taking to class.",
+    "inspection": {
+      "condition": "Fair",
+      "notes": "Sample inspection: visible case scratches; screen and controls checked.",
+      "battery_health": 82,
+      "battery_status": "Measured capacity vs. design capacity",
+      "accessories": "Compatible charger included; no other accessories."
+    }
   },
   {
     "id": "demo-acer",
@@ -156,7 +205,14 @@
       "Everyday study",
       "Coding"
     ],
-    "reason": "A slim Linux option for everyday work and learning to code."
+    "reason": "A slim Linux option for everyday work and learning to code.",
+    "inspection": {
+      "condition": "Good",
+      "notes": "Sample inspection: light case wear; screen and controls checked.",
+      "battery_health": 86,
+      "battery_status": "Measured capacity vs. design capacity",
+      "accessories": "Compatible charger included; no other accessories."
+    }
   },
   {
     "id": "demo-ipad",
@@ -175,6 +231,13 @@
     "uses": [
       "Everyday study"
     ],
-    "reason": "A tablet for reading and handwritten notes. Check desktop-software needs before reserving."
+    "reason": "A tablet for reading and handwritten notes. Check desktop-software needs before reserving.",
+    "inspection": {
+      "condition": "Good",
+      "notes": "Sample inspection: light case wear; screen and controls checked.",
+      "battery_health": 91,
+      "battery_status": "Measured capacity vs. design capacity",
+      "accessories": "Compatible charger included; no other accessories."
+    }
   }
 ]
