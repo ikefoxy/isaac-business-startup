@@ -1842,3 +1842,16 @@
 #apply-reward { margin:0 0 4px; }
 @media(max-width:720px) { .donation-guide-grid { grid-template-columns:1fr; gap:18px; } .catalog-route .app-intro h1 { font-size:27px; } }
 @media(max-width:420px) { .inspection-grid { grid-template-columns:1fr; } .donation-guide { padding:14px; } .detail-reserve { align-items:stretch; flex-direction:column; } .catalog-route .app-container { margin-top:18px; } }
+
+.catalog-heading { display:flex; justify-content:space-between; align-items:center; gap:16px; margin-bottom:14px; }
+.catalog-heading h1 { font-size:32px; line-height:1.2; letter-spacing:-1px; margin:0; }
+.catalog-heading>span { flex-shrink:0; background:#e5eefb; color:#3f679d; padding:5px 9px; border-radius:6px; font-size:10px; }
+.catalog-credits { display:inline-block; margin-top:18px; font-size:10px; color:#627992; }
+.catalog-route .catalog-search { margin-top:0; }
+@media(max-width:600px) {
+  .catalog-heading h1 { font-size:28px; }
+  .catalog-route .catalog-filter-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+  .catalog-route .catalog-filter-grid label { min-width:0; }
+  .catalog-route .catalog-filter-grid select { width:100%; }
+  .catalog-route .filter-summary { gap:12px; }
+}

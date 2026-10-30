@@ -8,7 +8,8 @@
     "format:check": "prettier --check playbook.html playbook.css playbook.js eslint.config.mjs package.json",
     "format": "prettier --write playbook.html playbook.css playbook.js eslint.config.mjs package.json",
     "check": "npm run lint && npm run format:check",
-    "test": "python3 -m unittest discover -s tests -v"
+    "test": "python3 -m unittest discover -s tests -v && npm run test:catalog",
+    "test:catalog": "node --test tests/test_shop.cjs"
   },
   "devDependencies": {
     "eslint": "10.12.0",

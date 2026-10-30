@@ -136,3 +136,9 @@ Open `playbook.html` for the first-day simulation: enter an optional first name,
 The static GitHub Pages preview supports browsing sample product details and reading/drafting the donation steps. Accounts, server-verified reward totals, orders and organizer publication require `python3 server.py`. The local app is **http://localhost:4173/** (store) and **http://localhost:4173/app.html#catalog** (catalog). No credentials or local order data are committed.
 
 Verification: 18 HTTP/SQLite tests, including quote permissions, invalid/held rewards, capped/free pricing, changed-total rejection, inspection persistence and unknown legacy fields. Browser checks cover product details, reservation sign-in return, a $179 − $20 = $159 reservation, donation guidance, and responsive layouts.
+
+### Catalog and mobile cleanup — October 29
+
+The catalog uses short labels and availability-aware filters. Every enabled filter combination has matching available inventory; incompatible options are disabled rather than returning unrelated devices. Text searches can still return no matches. `npm run test:catalog` checks option coverage, combined filters, searches, product links, and unavailable inventory. CI runs these checks alongside the existing backend suite.
+
+The donation overview has three short cards with separate number badges and headings. Cards stack on phones; catalog filters use two columns. Browser checks verified 320px and 375px layouts without horizontal overflow.

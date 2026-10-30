@@ -124,7 +124,7 @@
     catalog=config.static ? await fetch('catalog-data.json').then(response=>{if(!response.ok) throw new Error('The sample collection could not load. Please refresh.');return response.json();}) : (await api('catalog')).items;
     const params=new URLSearchParams(location.search);
     catalogItemFilter=params.get('item')||'';
-    view.innerHTML=intro('THE BYTEBACK COMPUTER STORE','Find your fit. Keep your budget.','Choose your brand, operating system, and hardware. Reserve online, then collect locally.')+`<section class="store-catalog"><p class="small muted">${config.demo ? 'Demo collection · Reference photos and sample configurations. No real purchase or pickup is arranged.' : 'Available community devices. Check each listing’s specifications before reserving.'}</p>${window.ByteBackShop.filters(params)}<div id="catalog-results" class="catalog-grid"></div><p class="catalog-disclaimer">Reference photos show the model family; sample hardware configurations may differ. <a href="image-credits.html">Photo credits & licenses</a>.</p></section>`;
+    view.innerHTML=`<div class="catalog-heading"><h1>Computers</h1><span>${config.demo?'Demo inventory':'Available now'}</span></div><section class="store-catalog">${window.ByteBackShop.filters(params)}<div id="catalog-results" class="catalog-grid"></div><a class="catalog-credits" href="image-credits.html">Photo credits</a></section>`;
     if(['low','high','ram'].includes(params.get('sort'))) $('#catalog-sort').value=params.get('sort');
     filterCatalog(false);
     if(catalogItemFilter) productDetails(catalogItemFilter);
@@ -134,11 +134,18 @@
     const f={q:$('#catalog-search').value,item:catalogItemFilter};
     document.querySelectorAll('[data-shop-filter]').forEach(x=>f[x.dataset.shopFilter]=x.value);
     let items=window.ByteBackShop.filter(catalog,f);
+    const available=window.ByteBackShop.facets(catalog,f);
+    document.querySelectorAll('[data-shop-filter]').forEach(select=>{
+      const values=available[select.dataset.shopFilter];
+      for(const option of select.options) {
+        option.disabled=!!option.value && !values.includes(select.dataset.shopFilter==='budget'?Number(option.value):option.value);
+      }
+    });
     const sort=$('#catalog-sort').value;
     if(sort!=='default') f.sort=sort;
     if(sort!=='default') items.sort((a,b)=>sort==='ram'?(b.ram||0)-(a.ram||0):sort==='low'?a.price-b.price:b.price-a.price);
-    $('#catalog-results').innerHTML=items.map(i=>window.ByteBackShop.card(i,{reserve:true})).join('')||'<div class="empty catalog-empty"><h2>No computers match those filters.</h2><p>Try another brand or operating system, or clear your filters to see every available device.</p></div>';
-    $('#result-count').textContent=items.length+' computer'+(items.length===1?'':'s')+' found'+(catalogItemFilter?' · Selected device':'');
+    $('#catalog-results').innerHTML=items.map(i=>window.ByteBackShop.card(i,{reserve:true})).join('')||'<div class="empty catalog-empty"><h2>No matches.</h2><p>Try another search or clear the filters.</p></div>';
+    $('#result-count').textContent=items.length+' computer'+(items.length===1?'':'s')+(catalogItemFilter?' · Selected device':'');
     if(updateURL) {
       const query=new URLSearchParams(Object.entries(f).filter(([k,v])=>v));
       history.replaceState(null,'',location.pathname+(query.size?'?'+query:'')+'#catalog');
@@ -418,7 +425,7 @@
     catch {
       config={demo:true,static:true,shipping:false,dropoff:'Preview only — no physical handoff is arranged',stages:['Submitted','Received','Data wiped','Refurbished','Ready for student','Collected']};
     }
-    $('#mode-banner').textContent=config.static ? 'Website preview · Browse sample devices and donation steps. Start the local server for sign-in, rewards and reservations.' : config.demo ? 'You’re in the demo · Try the full process with sample devices. No real shipments or payments.' : 'For students in Provo · Every device has someone next.';
+    $('#mode-banner').textContent=config.static ? 'Preview · Sign-in and reservations run locally.' : config.demo ? 'Demo · No real shipments or payments.' : 'For students in Provo · Every device has someone next.';
     if(!config.static) { try {user=await api('me');} catch {/* Signed-out visitors can browse and prepare donations. */} }
     updateAccount(); await render();
   });

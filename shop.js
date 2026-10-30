@@ -11,12 +11,22 @@ window.ByteBackShop = (() => {
     return `<dl class="inspection-grid"><div><dt>Battery health</dt><dd>${measured?`${i.battery_health}% of design capacity`:esc(i.battery_status||'Not measured')}</dd></div><div><dt>Product condition</dt><dd>${esc(i.condition||'Not recorded')}</dd></div><div><dt>Included accessories</dt><dd>${esc(i.accessories||'Not recorded—ask the organizer before reserving.')}</dd></div><div><dt>Inspection notes</dt><dd>${esc(i.notes||'Detailed inspection notes have not been recorded.')}</dd></div></dl>`;
   }
   function filters(params=new URLSearchParams()) {
-    const select=(key,label)=>`<label>${label}<select data-shop-filter="${key}" id="filter-${key}"><option value="">All ${label.toLowerCase()}</option>${options[key].map(v=>`<option value="${esc(v)}" ${params.get(key)===v?'selected':''}>${esc(v)}</option>`).join('')}</select></label>`;
-    return `<form class="catalog-search" id="catalog-search-form"><label class="sr-only" for="catalog-search">Search computers</label><input id="catalog-search" type="search" value="${esc(params.get('q')||'')}" placeholder="Search ThinkPad, Ryzen, MacBook…"><button class="button" type="submit">Search</button></form><div class="catalog-filter-grid">${select('brand','Brands')}${select('os','Operating systems')}${select('cpu','Processors')}${select('gpu','Graphics')}<label>Budget<select data-shop-filter="budget" id="filter-budget"><option value="">Any price</option>${[100,200,300,500].map(n=>`<option value="${n}" ${Number(params.get('budget'))===n?'selected':''}>Up to $${n}</option>`).join('')}</select></label><label>Sort by<select id="catalog-sort"><option value="default">Recommended order</option><option value="low">Price: low to high</option><option value="high">Price: high to low</option><option value="ram">Most memory</option></select></label></div><div class="filter-summary"><span id="result-count" role="status"></span><button class="text-button" type="button" id="clear-filters">Clear filters</button></div>`;
+    const select=(key,label)=>`<label>${label}<select data-shop-filter="${key}" id="filter-${key}"><option value="">Any ${label==='OS'?'OS':label.toLowerCase()}</option>${options[key].map(v=>`<option value="${esc(v)}" ${params.get(key)===v?'selected':''}>${esc(v)}</option>`).join('')}</select></label>`;
+    return `<form class="catalog-search" id="catalog-search-form"><label class="sr-only" for="catalog-search">Search computers</label><input id="catalog-search" type="search" value="${esc(params.get('q')||'')}" placeholder="Search computers"><button class="button" type="submit">Search</button></form><div class="catalog-filter-grid">${select('brand','Brand')}${select('os','OS')}${select('cpu','Processor')}${select('gpu','Graphics')}<label>Budget<select data-shop-filter="budget" id="filter-budget"><option value="">Any price</option>${[100,200,300,500].map(n=>`<option value="${n}" ${Number(params.get('budget'))===n?'selected':''}>Up to $${n}</option>`).join('')}</select></label><label>Sort by<select id="catalog-sort"><option value="default">Recommended</option><option value="low">Price: low to high</option><option value="high">Price: high to low</option><option value="ram">Most memory</option></select></label></div><div class="filter-summary"><span id="result-count" role="status"></span><button class="text-button" type="button" id="clear-filters">Clear filters</button></div>`;
   }
   function filter(items,f) {
     const q=(f.q||'').toLowerCase().trim();
     return items.filter(p=>(!q||[p.name,p.specs,p.brand,p.os,p.cpu,p.gpu].join(' ').toLowerCase().includes(q))&&['brand','os','cpu','gpu'].every(k=>!f[k]||p[k]===f[k])&&(!f.budget||p.price<=Number(f.budget))&&(!f.item||p.id===f.item));
   }
-  return {esc,card,filters,filter,options,inspectionDetails};
+  function facets(items, selected={}) {
+    const result={};
+    for(const field of ['brand','os','cpu','gpu','budget']) {
+      const others={...selected};
+      delete others[field];
+      const compatible=filter(items,others);
+      result[field]=field==='budget'?[100,200,300,500].filter(limit=>compatible.some(item=>item.price<=limit)):[...new Set(compatible.map(item=>item[field]).filter(Boolean))];
+    }
+    return result;
+  }
+  return {esc,card,filters,filter,options,inspectionDetails,facets};
 })();
