@@ -1,10 +1,28 @@
 # ByteBack: three implemented maturity improvements
 
-Framework: general tech-maturity principles for scalability, observability, and recoverability. Class slides were not provided; these are not claimed to be the instructor's exact stage labels.
+Model: the five-level technology maturity model supplied for this assignment. These changes implement practices from three distinct levels; they do not claim that the entire company has reached those levels.
 
-1. **Scalable catalog:** Added indexed SQL filtering and six-item catalog pages so larger inventories do not require downloading or rendering every device at once.
-2. **Operational visibility:** Added live readiness checks, request IDs and a private health dashboard so the operator can detect database failures and trace API errors quickly.
-3. **Recoverable data:** Added hourly SQLite snapshots with integrity checks and restore drills so donation, reservation and reward data can be recovered from a verified copy.
+1. **Level 2 - Repeatable | Verified backups**
+   - Implemented: hourly SQLite snapshots, integrity checks and restore drills; retain seven verified copies.
+   - Model fit: the same recovery checks repeat automatically using a consistent procedure.
+   - Why prioritized: reliable recovery protects donation, reservation and reward records.
+2. **Level 3 - Defined | Standard catalog API**
+   - Implemented: one documented catalog API with indexed filters, sorting and bounded pages, integrated into the catalog and homepage.
+   - Model fit: catalog retrieval follows a defined, documented process enforced in software and tests.
+   - Why prioritized: consistent retrieval keeps downloads and rendering bounded as inventory grows.
+3. **Level 4 - Managed | Measured service health**
+   - Implemented: a private dashboard measures API requests, server errors and average response time; readiness checks detect database failures.
+   - Model fit: collected numerical data makes service quality measurable for operator review.
+   - Why prioritized: operators can assess errors and latency instead of relying on user reports alone.
+
+## Defined catalog contract (Level 3)
+
+- Endpoint: `GET /api/catalog`.
+- Default page size: 6; maximum: 48. Pages outside the result range are clamped.
+- Search and filters apply before pagination, across available inventory.
+- Responses include `items`, `page`, `page_size`, `total`, `total_pages` and `facets`.
+- The catalog uses Next/Previous and resets to page 1 when filters change. The homepage requests at most 12 featured devices.
+- Parameterized SQL, supported sort orders and automated tests enforce the shared contract.
 
 ## What is implemented
 

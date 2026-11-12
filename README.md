@@ -145,8 +145,8 @@ The donation overview has three short cards with separate number badges and head
 
 ## Tech maturity improvements — November 12, 2026
 
-- **Scalability:** indexed SQL filtering and six-device catalog pages; API responses are capped at 48 devices, and filters use full-inventory facets. Homepage recommendations request a bounded featured set. Static previews page the sample collection locally.
-- **Observability:** `/api/health` reports real database readiness (503 on failure); the authenticated Operations workspace shows per-process API counts, failures, response times and sanitized request IDs. Live access requires an organizer account; signed-in local demo accounts can try the operator workspace.
-- **Recoverability:** online SQLite snapshots run on startup and hourly while the server runs, keep seven verified copies by default, and can be triggered from Operations. Each snapshot passes integrity checks and a non-destructive restore drill with row-count verification. Backup files are private and are never served by HTTP.
+- **Level 3 - Defined:** a documented catalog API standardizes indexed SQL filtering and six-device catalog pages; API responses are capped at 48 devices, and filters use full-inventory facets. Homepage recommendations request a bounded featured set. Static previews page the sample collection locally.
+- **Level 4 - Managed:** `/api/health` reports real database readiness (503 on failure); the authenticated Operations workspace shows per-process API counts, failures, response times and sanitized request IDs. Live access requires an organizer account; signed-in local demo accounts can try the operator workspace.
+- **Level 2 - Repeatable:** online SQLite snapshots run on startup and hourly while the server runs, keep seven verified copies by default, and can be triggered from Operations. Each snapshot passes integrity checks and a non-destructive restore drill with row-count verification. Backup files are private and are never served by HTTP.
 
 See [the implementation notes and recovery runbook](docs/tech-maturity-2026-11-12.md) for exact settings, restore commands and pilot limitations. Open **http://localhost:4173/app.html#operations**, sign in with a fictional address in local demo mode, and view Service health / Backups & recovery. GitHub Pages cannot run these Python operations; use the local server.
