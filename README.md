@@ -79,7 +79,7 @@ node --check shop.js
 node --check store.js
 ```
 
-The 18 tests cover storefront metadata, reservation persistence across catalog reseeding, single-use authentication, unauthorized access, CSRF, origin validation, private-file protection, invalid donations/addresses, idempotent submissions, competing reservations, cancellation/restocking, order editing, mock labels and receipts, live role enforcement, and the full donation → catalog → reservation → collection → donor-reward lifecycle, personal/gift-code access, discount application, cancellation restoration, and organizer pricing. Tests use a temporary database and never alter your app data.
+The 24 backend tests cover storefront metadata, reservation persistence across catalog reseeding, single-use authentication, unauthorized access, CSRF, origin validation, private-file protection, invalid donations/addresses, idempotent submissions, competing reservations, cancellation/restocking, order editing, mock labels and receipts, live role enforcement, and the full donation → catalog → reservation → collection → donor-reward lifecycle, personal/gift-code access, discount application, cancellation restoration, and organizer pricing. Tests use a temporary database and never alter your app data.
 
 Browser checks exercised featured slides, purpose recommendations, homepage search, combined catalog filters, empty results, persistent filter/sort URLs, product deep links, sign-in to reservation, donation, cancellation, reload persistence, QR rendering, and screen widths of 320, 375, 768, and 1440 pixels. The new desktop/mobile homepage, filtered catalog, and blue donation screen had no automated WCAG 2 A/AA or WCAG 2.1 AA violations. Automated checks do not constitute accessibility certification.
 
@@ -142,3 +142,11 @@ Verification: 18 HTTP/SQLite tests, including quote permissions, invalid/held re
 The catalog uses short labels and availability-aware filters. Every enabled filter combination has matching available inventory; incompatible options are disabled rather than returning unrelated devices. Text searches can still return no matches. `npm run test:catalog` checks option coverage, combined filters, searches, product links, and unavailable inventory. CI runs these checks alongside the existing backend suite.
 
 The donation overview has three short cards with separate number badges and headings. Cards stack on phones; catalog filters use two columns. Browser checks verified 320px and 375px layouts without horizontal overflow.
+
+## Tech maturity improvements — November 12, 2026
+
+- **Scalability:** indexed SQL filtering and six-device catalog pages; API responses are capped at 48 devices, and filters use full-inventory facets. Homepage recommendations request a bounded featured set. Static previews page the sample collection locally.
+- **Observability:** `/api/health` reports real database readiness (503 on failure); the authenticated Operations workspace shows per-process API counts, failures, response times and sanitized request IDs. Live access requires an organizer account; signed-in local demo accounts can try the operator workspace.
+- **Recoverability:** online SQLite snapshots run on startup and hourly while the server runs, keep seven verified copies by default, and can be triggered from Operations. Each snapshot passes integrity checks and a non-destructive restore drill with row-count verification. Backup files are private and are never served by HTTP.
+
+See [the implementation notes and recovery runbook](docs/tech-maturity-2026-11-12.md) for exact settings, restore commands and pilot limitations. Open **http://localhost:4173/app.html#operations**, sign in with a fictional address in local demo mode, and view Service health / Backups & recovery. GitHub Pages cannot run these Python operations; use the local server.

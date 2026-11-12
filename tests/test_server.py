@@ -107,7 +107,7 @@ class MVPTests(unittest.TestCase):
         self.assertEqual(self.bob.request('GET', '/api/orders')[1]['orders'], [])
 
     def test_storefront_metadata_and_restart_preserves_reservations(self):
-        status, result = self.alice.request('GET', '/api/catalog')
+        status, result = self.alice.request('GET', '/api/catalog?limit=48')
         self.assertEqual(status, 200)
         items = result['items']
         self.assertTrue({'Apple', 'Dell', 'Lenovo', 'HP', 'ASUS', 'Acer', 'Microsoft'} <= {p['brand'] for p in items})
@@ -121,10 +121,10 @@ class MVPTests(unittest.TestCase):
             'request_key':'storefront-restart-check'})
         self.assertEqual(status, 200)
         server.init_db()
-        available = self.alice.request('GET', '/api/catalog')[1]['items']
+        available = self.alice.request('GET', '/api/catalog?limit=48')[1]['items']
         self.assertNotIn('demo-asus', {p['id'] for p in available})
         with patch.object(server, 'DEMO', False):
-            self.assertFalse(self.alice.request('GET', '/api/catalog')[1]['items'])
+            self.assertFalse(self.alice.request('GET', '/api/catalog?limit=48')[1]['items'])
 
     def test_full_donor_student_handoff_and_incentive(self):
         order = self.donation()[1]['order']
@@ -134,7 +134,7 @@ class MVPTests(unittest.TestCase):
             self.assertEqual((status, result['order']['status']), (200, expected))
         self.assertEqual(self.alice.request('POST', path+'/cancel', {})[0], 400)
         self.assertEqual(self.alice.request('POST', path+'/advance', {})[0], 400)
-        item = next(i for i in self.bob.request('GET', '/api/catalog')[1]['items'] if i['source']==order['id'])
+        item = next(i for i in self.bob.request('GET', '/api/catalog?limit=48')[1]['items'] if i['source']==order['id'])
         reservation = {'kind':'reservation', 'request_key':'student-reservation-123', 'student':True, 'item_id':item['id']}
         self.assertEqual(self.alice.request('POST','/api/orders',reservation)[0], 400)
         status, result = self.bob.request('POST','/api/orders',reservation)
@@ -155,7 +155,7 @@ class MVPTests(unittest.TestCase):
         client = [self.alice,self.bob][index]
         order_id = results[index][1]['order']['id']
         self.assertEqual(client.request('POST','/api/orders/'+order_id+'/cancel',{})[0],200)
-        self.assertIn('demo-dell', [i['id'] for i in client.request('GET','/api/catalog')[1]['items']])
+        self.assertIn('demo-dell', [i['id'] for i in client.request('GET','/api/catalog?limit=48')[1]['items']])
 
     def test_shipping_labels_address_edit_and_receipts(self):
         address = {'name':'Alice','street1':'123 Test Lane','city':'Provo','state':'UT','zip':'84601'}
@@ -175,7 +175,7 @@ class MVPTests(unittest.TestCase):
         with patch.object(server, 'DEMO', False):
             self.assertEqual(self.alice.request('POST','/api/orders/'+order['id']+'/advance',{})[0],403)
             self.assertEqual(self.alice.request('GET','/api/admin/orders')[0],403)
-            self.assertEqual(self.alice.request('GET','/api/catalog')[1]['items'],[])
+            self.assertEqual(self.alice.request('GET','/api/catalog?limit=48')[1]['items'],[])
 
     def test_expired_link_is_rejected(self):
         _, result = self.alice.request('POST', '/api/auth/request', {'email':'expired@example.com'})
@@ -195,7 +195,7 @@ class MVPTests(unittest.TestCase):
         order_id = result['order']['id']
         for _ in range(4):
             self.assertEqual(self.alice.request('POST', '/api/orders/'+order_id+'/advance', {})[0], 200)
-        item = next(i for i in self.bob.request('GET','/api/catalog')[1]['items'] if i['source']==order_id)
+        item = next(i for i in self.bob.request('GET','/api/catalog?limit=48')[1]['items'] if i['source']==order_id)
         self.assertEqual(item['donor_name'], 'Alex')
         self.assertEqual(item['student_note'], 'Good luck this semester!')
         self.assertEqual(self.alice.request('GET','/api/rewards')[1]['rewards'], [])
@@ -236,7 +236,7 @@ class MVPTests(unittest.TestCase):
             self.assertEqual(self.alice.request('POST',path,{})[0],200)
         self.assertEqual(self.alice.request('POST',path,{'listings':[{'price':-20}]})[0],400)
         self.assertEqual(self.alice.request('POST',path,{'listings':[{'price':79,'specs':'8 GB RAM · 256 GB SSD · Linux Mint'}]})[0],200)
-        item=next(i for i in self.bob.request('GET','/api/catalog')[1]['items'] if i['source']==result['order']['id'])
+        item=next(i for i in self.bob.request('GET','/api/catalog?limit=48')[1]['items'] if i['source']==result['order']['id'])
         self.assertEqual(item['price'],79)
         self.assertEqual(item['specs'],'8 GB RAM · 256 GB SSD · Linux Mint')
 
@@ -285,7 +285,7 @@ class MVPTests(unittest.TestCase):
         self.assertEqual(self.alice.request('POST',path,{'listings':[{**inspection,'battery_health':101}]})[0],400)
         self.assertEqual(self.alice.request('POST',path,{'listings':[{**inspection,'battery_health':True}]})[0],400)
         self.assertEqual(self.alice.request('POST',path,{'listings':[inspection]})[0],200)
-        item=next(p for p in self.bob.request('GET','/api/catalog')[1]['items'] if p['source']==order['id'])
+        item=next(p for p in self.bob.request('GET','/api/catalog?limit=48')[1]['items'] if p['source']==order['id'])
         self.assertEqual(item['inspection']['battery_health'],84)
         self.assertEqual(item['inspection']['condition'],'Fair')
         self.assertEqual(item['inspection']['accessories'],'65W charger; no mouse')
@@ -294,9 +294,130 @@ class MVPTests(unittest.TestCase):
         legacy=self.donation(request_key='legacy-inspection-123')[1]['order']
         for _ in range(4):
             self.assertEqual(self.alice.request('POST','/api/orders/'+legacy['id']+'/advance',{})[0],200)
-        unknown=next(p for p in self.bob.request('GET','/api/catalog')[1]['items'] if p['source']==legacy['id'])
+        unknown=next(p for p in self.bob.request('GET','/api/catalog?limit=48')[1]['items'] if p['source']==legacy['id'])
         self.assertIsNone(unknown['inspection']['battery_health'])
         self.assertEqual(unknown['inspection']['condition'],'Not recorded')
+
+
+
+    def test_catalog_pages_are_bounded_filtered_and_disjoint(self):
+        status,first=self.alice.request('GET','/api/catalog')
+        self.assertEqual(status,200)
+        self.assertEqual((len(first['items']),first['total'],first['page'],first['total_pages']),(6,9,1,2))
+        status,second=self.alice.request('GET','/api/catalog?page=2')
+        self.assertEqual(status,200)
+        self.assertEqual(len(second['items']),3)
+        self.assertFalse({i['id'] for i in first['items']} & {i['id'] for i in second['items']})
+        all_ids={i['id'] for i in first['items']+second['items']}
+        self.assertEqual(all_ids,set(server.DEMO_CATALOG))
+        _,filtered=self.alice.request('GET','/api/catalog?brand=Apple&os=macOS&budget=500')
+        self.assertEqual(filtered['total'],1)
+        self.assertTrue(all(i['brand']=='Apple' and i['os']=='macOS' and i['price']<=500 for i in filtered['items']))
+        self.assertNotIn('NVIDIA',filtered['facets']['gpu'])
+        _,search=self.alice.request('GET','/api/catalog?q=thinkpad&sort=ram')
+        self.assertEqual(search['total'],2)
+        self.assertEqual(search['items'][0]['ram'],16)
+        _,literal=self.alice.request('GET','/api/catalog?q=%25')
+        self.assertEqual(literal['total'],0)
+        _,empty=self.alice.request('GET','/api/catalog?brand=Apple&gpu=NVIDIA')
+        self.assertEqual(empty['total'],0)
+        for query in ['limit=0','limit=49','page=-1','page=no','budget=-1','sort=DROP']:
+            self.assertEqual(self.alice.request('GET','/api/catalog?'+query)[0],400,query)
+        _,clamped=self.alice.request('GET','/api/catalog?page=999')
+        self.assertEqual(clamped['page'],2)
+
+    def test_catalog_payload_stays_bounded_with_large_inventory(self):
+        with server.connect() as db:
+            for i in range(200):
+                item_id='scale-'+str(i)
+                db.execute('INSERT INTO inventory VALUES (?,?,?,?,?,?)',(item_id,'Scale laptop '+str(i),'8 GB RAM · Linux Mint',100+i,'Scale test','available'))
+                server.put_metadata(db,item_id,{'brand':'Lenovo','os':'Linux','cpu':'Intel','gpu':'Intel','ram':8,'photo':''})
+        _,page=self.alice.request('GET','/api/catalog?brand=Lenovo&os=Linux&limit=6&page=4')
+        self.assertEqual(len(page['items']),6)
+        self.assertGreaterEqual(page['total'],200)
+        self.assertEqual(page['page'],4)
+        _,largest=self.alice.request('GET','/api/catalog?limit=48')
+        self.assertEqual(len(largest['items']),48)
+        with server.connect() as db:
+            names={row['name'] for row in db.execute("PRAGMA index_list('inventory')")}
+            self.assertIn('idx_inventory_state_price',names)
+
+    def test_health_readiness_and_private_monitoring(self):
+        guest=Client(self.port)
+        self.assertEqual(guest.request('GET','/api/health')[1]['status'],'ready')
+        self.assertEqual(guest.request('GET','/api/ops')[0],401)
+        with patch.object(server,'DEMO',False), patch.dict(server.os.environ,{'BYTEBACK_LOG_REQUESTS':'0'}):
+            self.assertEqual(self.alice.request('GET','/api/ops')[0],403)
+            with patch.object(server,'ADMINS',{'alice@example.com'}):
+                self.assertEqual(self.alice.request('GET','/api/ops')[0],200)
+        with patch.object(server,'DB',str(Path(self.temp.name)/'missing.db')):
+            status,health=guest.request('GET','/api/health')
+            self.assertEqual(status,503)
+            self.assertEqual(health['status'],'not_ready')
+            self.assertFalse((Path(self.temp.name)/'missing.db').exists())
+        self.assertEqual(guest.request('GET','/api/health')[0],200)
+        _,ops=self.alice.request('GET','/api/ops')
+        self.assertGreater(ops['metrics']['errors'],0)
+        self.assertGreater(ops['metrics']['requests'],0)
+        serialized=json.dumps(ops['recent_requests'])
+        self.assertNotIn('alice@example.com',serialized)
+        self.assertNotIn('Cookie',serialized)
+        bad=guest.request('POST','/api/auth/verify',{'token':'SECRET-TEST-TOKEN'})[1]
+        self.assertTrue(bad['request_id'].startswith('REQ-'))
+        _,ops=self.alice.request('GET','/api/ops')
+        self.assertNotIn('SECRET-TEST-TOKEN',json.dumps(ops))
+
+    def test_verified_backup_and_safe_restore(self):
+        import recovery
+        self.donation()
+        with tempfile.TemporaryDirectory() as directory, patch.dict(server.os.environ,{'BYTEBACK_BACKUP_DIR':directory}):
+            status,result=self.alice.request('POST','/api/ops/backup',{})
+            self.assertEqual(status,200)
+            backup=result['backup']
+            self.assertEqual((backup['integrity'],backup['restore_drill']),('passed','passed'))
+            self.assertEqual(backup['verified_records']['orders'],1)
+            original=Path(directory)/(backup['id']+'.sqlite3')
+            restored=Path(directory)/'restored.sqlite3'
+            counts=recovery.restore_copy(original,restored)
+            self.assertEqual(counts,backup['verified_records'])
+            with self.assertRaises(FileExistsError):
+                recovery.restore_copy(original,restored)
+            self.assertEqual(self.alice.request('GET','/api/orders')[1]['orders'][0]['kind'],'donation')
+            self.assertEqual(self.alice.request('GET','/.data/backups/'+original.name)[0],404)
+            self.assertEqual(self.alice.request('POST','/api/ops/backup',{},**{'X-CSRF-Token':'bad'})[0],403)
+            self.assertEqual(Client(self.port).request('POST','/api/ops/backup',{})[0],401)
+            for _ in range(2):
+                recovery.create_backup(server.DB,directory,keep=2)
+            (Path(directory)/'backup-malformed.json').write_text('[]')
+            (Path(directory)/'backup-incomplete.json').write_text('{"id":"backup-incomplete"}')
+            self.assertEqual(len(recovery.list_backups(directory)),2)
+            self.assertEqual(len(list(Path(directory).glob('backup-*.sqlite3'))),2)
+            broken=Path(directory)/'broken.sqlite3'; broken.write_text('not a database')
+            failed=Path(directory)/'failed-restore.sqlite3'
+            with self.assertRaises(Exception):
+                recovery.restore_copy(broken,failed)
+            self.assertFalse(failed.exists())
+
+    def test_backup_failure_keeps_last_verified_snapshot(self):
+        import recovery
+        with tempfile.TemporaryDirectory() as directory, patch.dict(server.os.environ,{'BYTEBACK_BACKUP_DIR':directory}):
+            first=server.backup_once()
+            with patch.object(recovery,'restore_copy',side_effect=OSError('drill failed')):
+                with self.assertRaises(OSError):
+                    server.backup_once()
+            self.assertEqual(recovery.list_backups(directory)[0]['id'],first['id'])
+            self.assertEqual(len(list(Path(directory).glob('*.partial'))),0)
+            self.assertEqual(server.BACKUP_ERROR,'OSError')
+            server.backup_once()
+            self.assertIsNone(server.BACKUP_ERROR)
+
+    def test_automatic_backup_worker_starts_and_can_stop(self):
+        import threading
+        called=threading.Event()
+        with patch.object(server,'BACKUP_INTERVAL',1), patch.object(server,'backup_once',side_effect=lambda: called.set()):
+            stop=server.start_backup_worker()
+            self.assertTrue(called.wait(timeout=2))
+            stop.set()
 
 
     def test_carrier_purchase_timeout_reuses_shipment(self):

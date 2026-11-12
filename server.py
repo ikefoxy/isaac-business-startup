@@ -1,5 +1,6 @@
 """ByteBack MVP. Python standard library only; run: python3 server.py."""
 import base64
+from collections import deque
 import hashlib
 import hmac
 import json
@@ -11,13 +12,15 @@ import smtplib
 import sqlite3
 import ssl
 import time
+import threading
 import urllib.error
 import urllib.request
-from contextlib import contextmanager
+from contextlib import closing, contextmanager
 from email.message import EmailMessage
 from http.cookies import SimpleCookie
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
-from urllib.parse import urlsplit
+from urllib.parse import parse_qs, urlsplit
+import recovery
 
 ROOT = Path(__file__).resolve().parent
 DEMO_CATALOG = {p['id']: p for p in json.loads((ROOT / 'catalog-data.json').read_text())}
@@ -35,12 +38,22 @@ ADMINS = {v.strip().lower() for v in os.getenv('ADMIN_EMAILS', '').split(',') if
 STAGES = ['Submitted', 'Received', 'Data wiped', 'Refurbished', 'Ready for student', 'Collected']
 TYPES = {'Laptop': 2, 'Desktop': 7, 'Tablet': .5}
 DROP = os.getenv('DROPOFF_DESCRIPTION', 'Demo campus drop-off · Provo (no physical collection location is operating)')
+BACKUP_INTERVAL = max(0, int(os.getenv('BYTEBACK_BACKUP_INTERVAL_SECONDS', '3600')))
+BACKUP_KEEP = max(1, int(os.getenv('BYTEBACK_BACKUP_KEEP', '7')))
+BACKUP_LOCK = threading.Lock()
+BACKUP_ACTIVE = False
+BACKUP_ERROR = None
+STARTED_AT = time.time()
+METRICS_LOCK = threading.Lock()
+METRICS = {'requests': 0, 'errors': 0, 'total_ms': 0.0}
+RECENT_REQUESTS = deque(maxlen=20)
 
 
 @contextmanager
 def connect():
     db = sqlite3.connect(DB, timeout=30)
     db.row_factory = sqlite3.Row
+    db.execute("PRAGMA foreign_keys=ON")
     try:
         with db:
             yield db
@@ -61,10 +74,183 @@ def init_db():
         CREATE TABLE IF NOT EXISTS throttles (key TEXT PRIMARY KEY, count INTEGER, expires REAL);
         CREATE TABLE IF NOT EXISTS rewards (code TEXT PRIMARY KEY, email TEXT, choice TEXT, amount INTEGER, state TEXT, source TEXT UNIQUE, reservation TEXT, created REAL);
         ''')
+        db.executescript("""
+        CREATE TABLE IF NOT EXISTS inventory_metadata (
+          id TEXT PRIMARY KEY REFERENCES inventory(id) ON DELETE CASCADE,
+          brand TEXT, os TEXT, cpu TEXT, gpu TEXT, ram INTEGER, data TEXT NOT NULL);
+        CREATE INDEX IF NOT EXISTS idx_inventory_state_price ON inventory(state, price, id);
+        CREATE INDEX IF NOT EXISTS idx_metadata_brand ON inventory_metadata(brand);
+        CREATE INDEX IF NOT EXISTS idx_metadata_os ON inventory_metadata(os);
+        CREATE INDEX IF NOT EXISTS idx_metadata_cpu ON inventory_metadata(cpu);
+        CREATE INDEX IF NOT EXISTS idx_metadata_gpu ON inventory_metadata(gpu);
+        CREATE INDEX IF NOT EXISTS idx_orders_email_created ON orders(email, created);
+        CREATE INDEX IF NOT EXISTS idx_messages_email_created ON messages(email, created);
+        """)
         if DEMO:
             for item in DEMO_CATALOG.values():
                 db.execute('INSERT INTO inventory VALUES (?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET name=excluded.name,specs=excluded.specs,price=excluded.price',
                            (item['id'], item['name'], item['specs'], item['price'], 'Demo inventory', 'available'))
+                put_metadata(db, item['id'], catalog_attributes(item))
+        # Backfill existing pilot listings once; subsequent requests use indexed columns.
+        rows = db.execute('SELECT i.* FROM inventory i LEFT JOIN inventory_metadata m ON i.id=m.id WHERE m.id IS NULL').fetchall()
+        for row in rows:
+            donor = db.execute('SELECT data FROM orders WHERE id=?', (row['source'],)).fetchone()
+            donor_data = json.loads(donor['data']) if donor else None
+            inspection = None
+            if donor_data:
+                index = int(row['id'].rsplit('-', 1)[1])
+                listings = donor_data.get('listings', [])
+                inspection = listings[index].get('inspection', {}) if index < len(listings) else {}
+            put_metadata(db, row['id'], catalog_attributes(dict(row), donor_data, inspection))
+
+
+
+def catalog_attributes(item, donor=None, inspection=None):
+    if item['id'] in DEMO_CATALOG:
+        return {k: v for k, v in DEMO_CATALOG[item['id']].items() if k not in ['id', 'price', 'name', 'specs']}
+    text = (item['name'] + ' ' + item['specs']).lower()
+    attrs = {'brand': next((b for b in ['Apple','Dell','Lenovo','HP','ASUS','Acer','Microsoft'] if re.search(r'\b'+b.lower()+r'\b', text)), 'Other')}
+    if 'thinkpad' in text:
+        attrs['brand'] = 'Lenovo'
+    for key, choices in {
+        'os': [('macOS',['macos']),('Windows',['windows']),('Linux',['linux','ubuntu','mint']),('iPadOS',['ipados'])],
+        'cpu': [('AMD',['ryzen','amd cpu']),('Intel',['intel','core i']),('Apple silicon',['apple m1','apple m2','apple m3','apple m4'])],
+        'gpu': [('NVIDIA',['nvidia','geforce','rtx']),('AMD',['radeon']),('Intel',['intel graphics','intel uhd','iris']),('Apple',['apple gpu'])]
+    }.items():
+        attrs[key] = next((label for label, terms in choices if any(term in text for term in terms)), '')
+    ram = re.search(r'(\d+)\s*gb\s*ram', text)
+    attrs.update({'ram': int(ram.group(1)) if ram else 0, 'photo': '', 'inspection': inspection or {}})
+    if donor:
+        attrs.update({'student_note': donor.get('student_note', ''), 'donor_name': donor.get('first_name', '') or 'A fellow student'})
+    return attrs
+
+
+def put_metadata(db, item_id, attrs):
+    db.execute('INSERT OR REPLACE INTO inventory_metadata VALUES (?,?,?,?,?,?,?)',
+               (item_id, attrs.get('brand', 'Other'), attrs.get('os', ''), attrs.get('cpu', ''), attrs.get('gpu', ''), attrs.get('ram', 0), json.dumps(attrs)))
+
+
+def catalog_page(url):
+    params = parse_qs(urlsplit(url).query, keep_blank_values=True)
+    value = lambda key, default='': params.get(key, [default])[0]
+    try:
+        limit, page = int(value('limit', '6')), int(value('page', '1'))
+        budget = int(value('budget')) if value('budget') else None
+    except ValueError:
+        raise APIError('Use whole numbers for page, limit and budget.')
+    require(1 <= limit <= 48 and 1 <= page <= 1000000, 'Page must be positive and limit must be from 1 to 48.')
+    require(budget is None or 0 <= budget <= 1000000, 'Use a valid budget.')
+    sort = value('sort', 'default')
+    require(sort in ['default', 'low', 'high', 'ram'], 'Choose a valid sort order.')
+    fields = {'brand': 'm.brand', 'os': 'm.os', 'cpu': 'm.cpu', 'gpu': 'm.gpu'}
+
+    def where(exclude=None):
+        clauses, arguments = ["i.state='available'", "(? OR i.id NOT LIKE 'demo-%')"], [DEMO]
+        for key, column in fields.items():
+            if key != exclude and value(key):
+                require(len(value(key)) <= 80, 'Filter value is too long.')
+                clauses.append(column + '=?')
+                arguments.append(value(key))
+        if value('item'):
+            clauses.append('i.id=?')
+            arguments.append(value('item')[:100])
+        if budget is not None and exclude != 'budget':
+            clauses.append('i.price<=?')
+            arguments.append(budget)
+        if value('q').strip():
+            q = value('q').strip().lower()[:100].replace('\\', '\\\\').replace('%', '\\%').replace('_', '\\_')
+            clauses.append("LOWER(i.name || ' ' || i.specs || ' ' || m.brand || ' ' || m.os || ' ' || m.cpu || ' ' || m.gpu) LIKE ? ESCAPE '\\'")
+            arguments.append('%' + q + '%')
+        return ' AND '.join(clauses), arguments
+
+    join = ' FROM inventory i JOIN inventory_metadata m ON i.id=m.id WHERE '
+    condition, arguments = where()
+    ordering = {'default': 'i.price ASC, i.id ASC', 'low': 'i.price ASC, i.id ASC', 'high': 'i.price DESC, i.id ASC', 'ram': 'm.ram DESC, i.id ASC'}[sort]
+    with connect() as db:
+        total = db.execute('SELECT COUNT(*)' + join + condition, arguments).fetchone()[0]
+        pages = max(1, (total + limit - 1) // limit)
+        page = min(page, pages)
+        rows = db.execute('SELECT i.*, m.data AS metadata_json' + join + condition + ' ORDER BY ' + ordering + ' LIMIT ? OFFSET ?', arguments + [limit, (page-1)*limit]).fetchall()
+        items = []
+        for row in rows:
+            item = dict(row)
+            item.update(json.loads(item.pop('metadata_json')))
+            items.append(item)
+        facets = {}
+        for key, column in fields.items():
+            condition, arguments = where(exclude=key)
+            facets[key] = [row[0] for row in db.execute('SELECT DISTINCT ' + column + join + condition + ' ORDER BY ' + column, arguments) if row[0]]
+        condition, arguments = where(exclude='budget')
+        minimum = db.execute('SELECT MIN(i.price)' + join + condition, arguments).fetchone()[0]
+        facets['budget'] = [n for n in [100, 200, 300, 500] if minimum is not None and minimum <= n]
+    return {'items': items, 'page': page, 'page_size': limit, 'total': total, 'total_pages': pages, 'facets': facets}
+
+
+def readiness():
+    try:
+        with closing(sqlite3.connect(Path(DB).resolve().as_uri() + '?mode=ro', uri=True, timeout=1)) as db:
+            db.execute('SELECT 1 FROM inventory LIMIT 1').fetchone()
+        return {'status': 'ready', 'database': 'connected'}
+    except sqlite3.Error:
+        return {'status': 'not_ready', 'database': 'unavailable'}
+
+
+def backup_directory():
+    return Path(os.getenv('BYTEBACK_BACKUP_DIR', str(Path(DB).parent / 'backups')))
+
+
+def backup_once():
+    global BACKUP_ERROR
+    with BACKUP_LOCK:
+        try:
+            result = recovery.create_backup(DB, backup_directory(), BACKUP_KEEP)
+            BACKUP_ERROR = None
+            return result
+        except Exception as error:
+            BACKUP_ERROR = type(error).__name__
+            raise
+
+
+def start_backup_worker():
+    global BACKUP_ACTIVE
+    stop = threading.Event()
+    if BACKUP_INTERVAL <= 0:
+        return stop
+    BACKUP_ACTIVE = True
+
+    def run():
+        global BACKUP_ACTIVE
+        try:
+            while not stop.is_set():
+                try:
+                    backup_once()
+                except Exception:
+                    pass  # Sanitized failure is visible in the operator dashboard.
+                stop.wait(BACKUP_INTERVAL)
+        finally:
+            BACKUP_ACTIVE = False
+    threading.Thread(target=run, name='byteback-backups', daemon=True).start()
+    return stop
+
+
+def record_request(path, status, elapsed, request_id):
+    safe_path = path if path in ['/api/config', '/api/catalog', '/api/health', '/api/ops', '/api/ops/backup', '/api/orders', '/api/me', '/api/messages', '/api/rewards', '/api/logout', '/api/auth/request', '/api/auth/verify', '/api/reservation-quote', '/api/admin/orders'] else '/api/other'
+    row = {'route': safe_path, 'status': status, 'duration_ms': round(elapsed, 2), 'request_id': request_id, 'at': time.time()}
+    with METRICS_LOCK:
+        METRICS['requests'] += 1
+        METRICS['errors'] += int(status >= 500)
+        METRICS['total_ms'] += elapsed
+        RECENT_REQUESTS.appendleft(row)
+    if os.getenv('BYTEBACK_LOG_REQUESTS', '0' if DEMO else '1') == '1':
+        print(json.dumps(row), flush=True)
+
+
+def operations_snapshot():
+    with METRICS_LOCK:
+        metrics = {**METRICS, 'average_ms': round(METRICS['total_ms']/max(1, METRICS['requests']), 2)}
+        recent = list(RECENT_REQUESTS)[:6]
+    return {'health': readiness(), 'uptime_seconds': int(time.time()-STARTED_AT), 'metrics': metrics, 'recent_requests': recent,
+            'backups': {'automatic': BACKUP_ACTIVE, 'interval_seconds': BACKUP_INTERVAL, 'keep': BACKUP_KEEP, 'last_error': BACKUP_ERROR, 'history': recovery.list_backups(backup_directory())[:BACKUP_KEEP]}}
 
 
 def digest(value):
@@ -202,6 +388,8 @@ class Handler(SimpleHTTPRequestHandler):
         pass
 
     def end_headers(self):
+        if getattr(self, 'request_id', None):
+            self.send_header('X-Request-ID', self.request_id)
         self.send_header('X-Content-Type-Options', 'nosniff')
         self.send_header('Referrer-Policy', 'no-referrer')
         self.send_header('X-Frame-Options', 'DENY')
@@ -209,6 +397,9 @@ class Handler(SimpleHTTPRequestHandler):
         super().end_headers()
 
     def send_json(self, obj, status=200, cookie=None):
+        self.request_status = status
+        if status >= 400 and getattr(self, 'request_id', None):
+            obj = {**obj, 'request_id': self.request_id}
         raw = json.dumps(obj).encode()
         self.send_response(status)
         self.send_header('Content-Type', 'application/json')
@@ -259,6 +450,9 @@ class Handler(SimpleHTTPRequestHandler):
         self.dispatch('POST', urlsplit(self.path).path)
 
     def dispatch(self, method, path):
+        self.request_id = uid('REQ')
+        self.request_status = 200
+        started = time.monotonic()
         try:
             data = {}
             if method == 'POST':
@@ -270,6 +464,8 @@ class Handler(SimpleHTTPRequestHandler):
             result = self.api(method, path, data)
             if result is not None:
                 self.send_json(result)
+        except (BrokenPipeError, ConnectionResetError):
+            self.request_status = 499  # Client cancelled; not a server failure.
         except APIError as error:
             self.send_json({'error': str(error)}, error.status)
         except (ValueError, TypeError, KeyError):
@@ -277,38 +473,18 @@ class Handler(SimpleHTTPRequestHandler):
         except Exception as error:
             print('Request failed:', type(error).__name__, flush=True)
             self.send_json({'error': 'Something went wrong. Your saved orders are still available. Please retry.'}, 500)
+        finally:
+            record_request(path, self.request_status, (time.monotonic()-started)*1000, self.request_id)
 
     def api(self, method, path, data):
         if method == 'GET' and path == '/api/config':
             return {'demo': DEMO, 'dropoff': DROP, 'stages': STAGES, 'shipping': DEMO or bool(os.getenv('EASYPOST_API_KEY'))}
         if method == 'GET' and path == '/api/catalog':
-            with connect() as db:
-                items = [dict(r) for r in db.execute("SELECT * FROM inventory WHERE state='available' AND (? OR id NOT LIKE 'demo-%')", (DEMO,))]
-                for item in items:
-                    if item['id'] in DEMO_CATALOG:
-                        item.update({k: v for k, v in DEMO_CATALOG[item['id']].items() if k not in ['id', 'price', 'name', 'specs']})
-                    else:
-                        # Only infer attributes explicitly present in the verified listing.
-                        text = (item['name'] + ' ' + item['specs']).lower()
-                        item['brand'] = next((b for b in ['Apple','Dell','Lenovo','HP','ASUS','Acer','Microsoft'] if re.search(r'\b'+b.lower()+r'\b', text)), 'Other')
-                        if 'thinkpad' in text:
-                            item['brand'] = 'Lenovo'
-                        item['os'] = next((label for label, terms in [('macOS',['macos']),('Windows',['windows']),('Linux',['linux','ubuntu','mint']),('iPadOS',['ipados'])] if any(t in text for t in terms)), '')
-                        item['cpu'] = next((label for label, terms in [('AMD',['ryzen','amd cpu']),('Intel',['intel','core i']),('Apple silicon',['apple m1','apple m2','apple m3','apple m4'])] if any(t in text for t in terms)), '')
-                        item['gpu'] = next((label for label, terms in [('NVIDIA',['nvidia','geforce','rtx']),('AMD',['radeon']),('Intel',['intel graphics','intel uhd','iris']),('Apple',['apple gpu'])] if any(t in text for t in terms)), '')
-                        ram = re.search(r'(\d+)\s*gb\s*ram', text)
-                        item['ram'] = int(ram.group(1)) if ram else 0
-                        item['photo'] = ''
-                    donor = db.execute('SELECT data FROM orders WHERE id=?', (item['source'],)).fetchone()
-                    if donor:
-                        d = json.loads(donor['data'])
-                        item['student_note'] = d.get('student_note', '')
-                        item['donor_name'] = d.get('first_name', '') or 'A fellow student'
-                        index = int(item['id'].rsplit('-', 1)[1])
-                        listings = d.get('listings', [])
-                        item['inspection'] = listings[index].get('inspection', {}) if index < len(listings) else {}
-
-                return {'items': items}
+            return catalog_page(self.path)
+        if method == 'GET' and path == '/api/health':
+            health = readiness()
+            self.send_json(health, 200 if health['status'] == 'ready' else 503)
+            return None
         if method == 'POST' and path == '/api/auth/request':
             self.rate_limit('login-ip:' + self.client_address[0], 30)
             email = str(data.get('email', '')).strip().lower()
@@ -336,6 +512,13 @@ class Handler(SimpleHTTPRequestHandler):
         user = self.session()
         if method == 'POST':
             require(hmac.compare_digest(self.headers.get('X-CSRF-Token', ''), user['csrf']), 'Refresh the page and try again.', 403)
+        if path in ['/api/ops', '/api/ops/backup']:
+            require(DEMO or user['email'] in ADMINS, 'Organizer access required.', 403)
+            if path == '/api/ops' and method == 'GET':
+                return operations_snapshot()
+            if path == '/api/ops/backup' and method == 'POST':
+                return {'backup': backup_once()}
+            raise APIError('Not found.', 404)
         if path == '/api/me' and method == 'GET':
             return {'email': user['email'], 'csrf': user['csrf'], 'admin': user['email'] in ADMINS}
         if path == '/api/logout' and method == 'POST':
@@ -405,6 +588,8 @@ class Handler(SimpleHTTPRequestHandler):
                             verified_listings.append({'inspection': listing_inspection(listing, device)})
                             db.execute('INSERT OR IGNORE INTO inventory VALUES (?,?,?,?,?,?)',
                                        (order_id + '-' + str(i), device['model'], specs, price, order_id, 'available'))
+                            item_id = order_id + '-' + str(i)
+                            put_metadata(db, item_id, catalog_attributes({'id': item_id, 'name': device['model'], 'specs': specs}, d, verified_listings[-1]['inspection']))
                         d['listings'] = verified_listings
                 else:
                     order['status'] = 'Collected'
@@ -539,5 +724,11 @@ if __name__ == '__main__':
             raise SystemExit('Live mode requires HTTPS PUBLIC_URL and: ' + ', '.join(missing))
     init_db()
     host = '127.0.0.1' if DEMO else os.getenv('HOST', '127.0.0.1')
+    stop_backups = start_backup_worker()
     print(f'ByteBack: {ORIGIN}/app.html — {"LOCAL DEMO" if DEMO else "LIVE"}', flush=True)
-    ThreadingHTTPServer((host, PORT), Handler).serve_forever()
+    http = ThreadingHTTPServer((host, PORT), Handler)
+    try:
+        http.serve_forever()
+    finally:
+        stop_backups.set()
+        http.server_close()

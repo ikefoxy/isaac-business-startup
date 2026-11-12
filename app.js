@@ -40,9 +40,10 @@
       sessionStorage.setItem('byteback-session-draft-v2',JSON.stringify({draft,step}));
     } catch { message('Browser draft saving is unavailable. Keep this tab open; submitted orders are still saved to your account.'); }
   }
-  async function api(path, data) {
+  async function api(path, data, options={}) {
     const response = await fetch('/api/' + path, {
       method: data === undefined ? 'GET' : 'POST',
+      signal: options.signal,
       headers: data === undefined ? {} : {'Content-Type':'application/json', 'X-CSRF-Token':user?.csrf || ''},
       body: data === undefined ? undefined : JSON.stringify(data)
     });
@@ -50,7 +51,7 @@
     try { result = await response.json(); } catch { throw new Error('Start the app with python3 server.py, then open http://localhost:4173/app.html. A static preview cannot run accounts or orders.'); }
     if (!response.ok) {
       if (response.status === 401 && !path.startsWith('auth/')) { user = null; updateAccount(); }
-      throw new Error(result.error || 'The request could not be completed.');
+      throw new Error((result.error || 'The request could not be completed.') + (response.status>=500 && result.request_id ? ' Reference: '+result.request_id : ''));
     }
     return result;
   }
@@ -65,7 +66,7 @@
     $('#modal-body').innerHTML = content;
     if (!modal.open) modal.showModal();
   }
-  function updateAccount() { $('#account').textContent = user ? 'My account' : 'Sign in'; $('#account').title = user?.email || 'Sign in with your email'; }
+  function updateAccount() { $('#account').textContent = user ? 'My account' : 'Sign in'; $('#account').title = user?.email || 'Sign in with your email'; $('#operations-link').hidden=!(user && (config.demo || user.admin)); }
   function signIn() {
     if(config.static) return openModal('<h2 id="modal-title">Try reservations in the local app.</h2><p>This published preview lets you browse sample devices and inspection details. Sign-in, verified reward totals and saved reservations need the ByteBack server.</p><p>Run <code>python3 server.py</code> in the project, then open <a href="http://localhost:4173/app.html#catalog">localhost:4173/app.html#catalog</a>.</p><a class="button button-outline" href="https://github.com/ikefoxy/isaac-business-startup">Get the project ↗</a>');
     returnRoute = route === 'success' ? 'orders' : route;
@@ -118,38 +119,90 @@
     else content = `<div class="form-heading"><span class="eyebrow">STEP 4 OF 4 · REVIEW</span><h2>Does everything look right${draft.first_name ? ', '+esc(draft.first_name) : ''}?</h2><p>Check the details below. You can go back to change anything before confirming.</p></div>${basket()}<dl class="review-list"><dt>Handoff</dt><dd>${draft.method === 'shipping' ? (config.demo ? 'Shipping · demo label' : 'Prepaid shipping') : 'Local drop-off'} <button class="text-button" type="button" data-next="2">Change</button></dd><dt>${draft.method === 'shipping' ? 'Return address' : 'Location'}</dt><dd>${draft.method === 'shipping' ? esc([draft.address.name,draft.address.street1,draft.address.city,draft.address.state,draft.address.zip].filter(Boolean).join(', ')) : esc(config.dropoff)}</dd><dt>Your thank-you</dt><dd>${draft.reward_choice === 'gift' ? '$20 code to share with a friend' : '$20 credit for a future computer'} <button class="text-button" type="button" data-next="3">Change</button></dd>${draft.student_note ? `<dt>Your note</dt><dd>“${esc(draft.student_note)}”</dd>` : ''}<dt>Your cost</dt><dd><strong>$0</strong></dd></dl><form id="donation-form"><div class="pledge-panel"><h3>Before your computer leaves you</h3><p class="small muted">Back up your files, sign out of your accounts, and remove activation locks.</p><label class="check"><input name="pledge" type="checkbox" required ${draft.pledge ? 'checked' : ''}><span>I’ll prepare my devices and authorize the team to erase their data. I understand that erased files cannot be recovered.</span></label></div><p class="small muted">${config.demo ? 'This is a test donation. No physical handoff is arranged.' : 'Your confirmation and handoff instructions will be sent by email.'}</p><div class="wizard-footer"><button class="text-button" type="button" data-next="3">← Your thank-you</button><button class="button" type="submit">${user ? 'Confirm donation' : 'Sign in & confirm'} <span aria-hidden="true">↗</span></button></div></form>`;
     view.innerHTML = intro('DONATE A DEVICE', 'Let’s get it to the next student.', 'Four short steps. A clear plan for your device.') + donationGuide() + `<div class="app-grid"><div><ol class="stepper">${['Your devices','Handoff','Your thank-you','Review'].map((t,i) => `<li class="${step > i+1 ? 'complete' : step === i+1 ? 'active' : ''}" ${step === i+1 ? 'aria-current="step"' : ''}><button type="button" data-next="${i+1}" ${i+1>step ? 'disabled' : ''}><span>${step > i+1 ? '✓' : i+1}</span>${t}</button></li>`).join('')}</ol><section class="app-card wizard-card">${content}</section></div>${impact()}</div>`;
   }
-  let catalogItemFilter='';
+  let catalogItemFilter='', catalogPage=1, catalogRun=0, catalogRequest=null, catalogTimer=null;
   async function renderCatalog() {
     document.body.classList.add('catalog-route');
-    catalog=config.static ? await fetch('catalog-data.json').then(response=>{if(!response.ok) throw new Error('The sample collection could not load. Please refresh.');return response.json();}) : (await api('catalog')).items;
     const params=new URLSearchParams(location.search);
     catalogItemFilter=params.get('item')||'';
-    view.innerHTML=`<div class="catalog-heading"><h1>Computers</h1><span>${config.demo?'Demo inventory':'Available now'}</span></div><section class="store-catalog">${window.ByteBackShop.filters(params)}<div id="catalog-results" class="catalog-grid"></div><a class="catalog-credits" href="image-credits.html">Photo credits</a></section>`;
+    catalogPage=Math.max(1,parseInt(params.get('page'),10)||1);
+    view.innerHTML=`<div class="catalog-heading"><h1>Computers</h1><span>${config.demo?'Demo inventory':'Available now'}</span></div><section class="store-catalog">${window.ByteBackShop.filters(params)}<div id="catalog-results" class="catalog-grid" aria-busy="true"></div><nav class="catalog-pagination" aria-label="Catalog pages"><button type="button" id="catalog-prev" class="button button-outline" disabled>← Previous</button><span id="catalog-page-status" role="status">Loading computers…</span><button type="button" id="catalog-next" class="button button-outline" disabled>Next →</button></nav><a class="catalog-credits" href="image-credits.html">Photo credits</a></section>`;
     if(['low','high','ram'].includes(params.get('sort'))) $('#catalog-sort').value=params.get('sort');
-    filterCatalog(false);
+    await filterCatalog(false,false);
     if(catalogItemFilter) productDetails(catalogItemFilter);
   }
-  function filterCatalog(updateURL=true) {
+  async function filterCatalog(updateURL=true, resetPage=true) {
     if(!$('#catalog-search')) return;
+    clearTimeout(catalogTimer);
+    if(resetPage) catalogPage=1;
+    const run=++catalogRun;
+    if(catalogRequest) catalogRequest.abort();
+    catalogRequest=new AbortController();
     const f={q:$('#catalog-search').value,item:catalogItemFilter};
     document.querySelectorAll('[data-shop-filter]').forEach(x=>f[x.dataset.shopFilter]=x.value);
-    let items=window.ByteBackShop.filter(catalog,f);
-    const available=window.ByteBackShop.facets(catalog,f);
-    document.querySelectorAll('[data-shop-filter]').forEach(select=>{
-      const values=available[select.dataset.shopFilter];
-      for(const option of select.options) {
-        option.disabled=!!option.value && !values.includes(select.dataset.shopFilter==='budget'?Number(option.value):option.value);
-      }
-    });
     const sort=$('#catalog-sort').value;
     if(sort!=='default') f.sort=sort;
-    if(sort!=='default') items.sort((a,b)=>sort==='ram'?(b.ram||0)-(a.ram||0):sort==='low'?a.price-b.price:b.price-a.price);
-    $('#catalog-results').innerHTML=items.map(i=>window.ByteBackShop.card(i,{reserve:true})).join('')||'<div class="empty catalog-empty"><h2>No matches.</h2><p>Try another search or clear the filters.</p></div>';
-    $('#result-count').textContent=items.length+' computer'+(items.length===1?'':'s')+(catalogItemFilter?' · Selected device':'');
-    if(updateURL) {
-      const query=new URLSearchParams(Object.entries(f).filter(([k,v])=>v));
-      history.replaceState(null,'',location.pathname+(query.size?'?'+query:'')+'#catalog');
+    $('#catalog-results').setAttribute('aria-busy','true');
+    $('#catalog-prev').disabled=true; $('#catalog-next').disabled=true;
+    try {
+      let result;
+      if(config.static) {
+        const response=await fetch('catalog-data.json',{signal:catalogRequest.signal});
+        if(!response.ok) throw new Error('The sample collection could not load. Refresh to try again.');
+        const all=await response.json();
+        const matching=window.ByteBackShop.filter(all,f);
+        if(sort!=='default') matching.sort((a,b)=>sort==='ram'?(b.ram||0)-(a.ram||0):sort==='low'?a.price-b.price:b.price-a.price);
+        const pages=Math.max(1,Math.ceil(matching.length/6));
+        const page=Math.min(catalogPage,pages);
+        result={items:matching.slice((page-1)*6,page*6),total:matching.length,page,total_pages:pages,facets:window.ByteBackShop.facets(all,f)};
+      } else {
+        const query=new URLSearchParams({...Object.fromEntries(Object.entries(f).filter(([,v])=>v)),page:catalogPage,limit:6});
+        result=await api('catalog?'+query,undefined,{signal:catalogRequest.signal});
+      }
+      if(run!==catalogRun || !$('#catalog-results')) return;
+      const normalizedPage=result.page!==catalogPage;
+      catalogPage=result.page; catalog=result.items;
+      document.querySelectorAll('[data-shop-filter]').forEach(select=>{
+        const values=result.facets[select.dataset.shopFilter];
+        if(select.dataset.shopFilter!=='budget') {
+          for(const value of values) if(![...select.options].some(option=>option.value===value)) {
+            const option=document.createElement('option'); option.value=value; option.textContent=value; select.append(option);
+          }
+        }
+        for(const option of select.options) option.disabled=!!option.value && !values.includes(select.dataset.shopFilter==='budget'?Number(option.value):option.value);
+      });
+      $('#catalog-results').innerHTML=catalog.map(i=>window.ByteBackShop.card(i,{reserve:true})).join('')||'<div class="empty catalog-empty"><h2>No matches.</h2><p>Try another search or clear the filters.</p></div>';
+      $('#result-count').textContent=result.total+' computer'+(result.total===1?'':'s');
+      $('#catalog-page-status').textContent='Page '+result.page+' of '+result.total_pages+' · '+catalog.length+' shown';
+      $('#catalog-prev').disabled=result.page<=1;
+      $('#catalog-next').disabled=result.page>=result.total_pages;
+      if(updateURL || normalizedPage) {
+        if(catalogPage>1) f.page=catalogPage;
+        const query=new URLSearchParams(Object.entries(f).filter(([,v])=>v));
+        history.replaceState(null,'',location.pathname+(query.size?'?'+query:'')+'#catalog');
+      }
+    } catch(error) {
+      if(error.name!=='AbortError' && run===catalogRun && $('#catalog-results')) {
+        message(error.message,true);
+        $('#catalog-page-status').textContent='Could not load. Change a filter or search to retry.';
+      }
+    } finally {
+      if(run===catalogRun && $('#catalog-results')) $('#catalog-results').setAttribute('aria-busy','false');
     }
+  }
+  async function operations() {
+    if(config.static) {
+      view.innerHTML=intro('OPERATIONS','Connect the local server.','Service monitoring and backups run with the Python app.')+'<a class="button" href="http://localhost:4173/app.html#operations">Open local operations →</a>';
+      return;
+    }
+    if(!user) {
+      view.innerHTML=intro('OPERATIONS','Keep ByteBack running.','Sign in to view server health and recovery status.')+'<button class="button" type="button" data-login>Sign in to operations</button>';
+      return;
+    }
+    const data=await api('ops');
+    const healthy=data.health.status==='ready';
+    const backup=data.backups.history[0];
+    const recent=data.recent_requests.map(row=>`<tr><td>${esc(row.route)}</td><td><span class="pill">${row.status}</span></td><td>${row.duration_ms} ms</td><td class="request-reference">${esc(row.request_id)}</td></tr>`).join('');
+    view.innerHTML=`<div class="ops-heading"><div><span class="eyebrow">OPERATOR WORKSPACE</span><h1>Operations</h1></div><button class="button button-outline" type="button" id="ops-refresh">Refresh status</button></div><section class="ops-panel" id="service-health"><div class="ops-panel-heading"><h2>Service health</h2><span class="ops-health ${healthy?'healthy':'unhealthy'}">${healthy?'Healthy':'Needs attention'}</span></div><div class="ops-stats"><div><span>Database</span><strong>${healthy?'Connected':'Unavailable'}</strong></div><div><span>API requests</span><strong>${data.metrics.requests}</strong></div><div><span>Server errors</span><strong>${data.metrics.errors}</strong></div><div><span>Average response</span><strong>${data.metrics.average_ms} ms</strong></div></div><p class="small muted">Measured since this server started · Database readiness is checked live.</p><h3>Recent API activity</h3><div class="ops-table-wrap"><table class="ops-table"><thead><tr><th>Route</th><th>Status</th><th>Response</th><th>Request ID</th></tr></thead><tbody>${recent||'<tr><td colspan="4">No requests recorded yet.</td></tr>'}</tbody></table></div><p class="small muted">Request IDs help trace failures. Personal data and sign-in tokens are excluded.</p></section><section class="ops-panel" id="data-recovery"><div class="ops-panel-heading"><div><h2>Backups & recovery</h2><p class="small muted">${data.backups.automatic?'Automatic snapshots every '+Math.round(data.backups.interval_seconds/60)+' minutes while the server runs.':'Automatic snapshots are not running.'} Keep the latest ${data.backups.keep}.</p></div><button type="button" class="button" id="create-backup">Create verified backup</button></div>${data.backups.last_error?'<p class="ops-backup-error" role="alert">Last backup failed. Check server storage and try again. Existing verified backups are retained.</p>':''}${backup?`<div class="ops-backup-success"><span aria-hidden="true">✓</span><div><h3>Backup verified. Restore drill passed.</h3><p>${date(backup.created_at)} · ${Math.ceil(backup.bytes/1024)} KB · SQLite snapshot</p></div></div><div class="ops-stats backup-checks"><div><span>Integrity check</span><strong>Passed</strong></div><div><span>Restore to a separate copy</span><strong>Passed</strong></div><div><span>Saved snapshots</span><strong>${data.backups.history.length}</strong></div></div><div class="backup-records">${Object.entries(backup.verified_records).map(([name,count])=>`<span><strong>${count}</strong> ${esc(name)} verified</span>`).join('')}</div><p class="small muted">Latest snapshot: ${esc(backup.id)}</p>`:'<p>No verified backup yet. Create one to check integrity and test restoration.</p>'}<p class="small muted">Backups stay private. Restore drills use a separate copy and never replace the active database.</p></section>`;
   }
   function success(order, status) {
     lastOrder = order; route = 'success';
@@ -241,6 +294,7 @@
   async function render() {
     if (!config) return;
     clearMessages();
+    if(location.hash!=='#catalog') { clearTimeout(catalogTimer); if(catalogRequest) catalogRequest.abort(); catalogRun++; }
     document.body.classList.toggle('catalog-route',location.hash==='#catalog');
     const hash = location.hash.slice(1);
     if (hash.startsWith('verify=')) {
@@ -248,7 +302,7 @@
       let returnSearch=location.search;
       try {
         const saved=JSON.parse(sessionStorage.getItem('byteback-login-context'));
-        if(saved && ['donate','catalog','orders','admin'].includes(saved.route)) {
+        if(saved && ['donate','catalog','orders','admin','operations'].includes(saved.route)) {
           returnRoute=saved.route; pendingReservation=saved.item; returnSearch=saved.search || '';
         }
         sessionStorage.removeItem('byteback-login-context');
@@ -258,14 +312,16 @@
         user=await api('auth/verify',{token}); updateAccount(); if(modal.open) modal.close();
         route=returnRoute;
         if(route==='catalog') { await renderCatalog(); if(pendingReservation) reserveDialog(pendingReservation); }
+        else if(route==='operations') await operations();
         else if(route==='orders'||route==='admin') await dashboard(route==='admin');
         else donate();
         message('You’re signed in. We kept your place.');
       } catch(e) { route='donate'; donate(); message(e.message,true); }
     } else {
-      route = ['donate','catalog','orders','admin'].includes(hash) ? hash : 'donate';
+      route = ['donate','catalog','orders','admin','operations'].includes(hash) ? hash : 'donate';
       if (route === 'donate') donate();
       if (route === 'catalog') await renderCatalog();
+      if (route === 'operations') await operations();
       if (route === 'orders' || route === 'admin') await dashboard(route==='admin');
     }
     document.querySelectorAll('[data-route]').forEach(a=>{
@@ -343,7 +399,14 @@
     if(!b) return;
     if(b.classList.contains('close-modal')) return modal.close();
     guarded(async()=>{
-      if(b.id==='apply-reward') {
+      if(b.id==='catalog-prev' || b.id==='catalog-next') {
+        catalogPage+=b.id==='catalog-next'?1:-1; await filterCatalog(true,false);
+      } else if(b.id==='ops-refresh') await operations();
+      else if(b.id==='create-backup') {
+        b.disabled=true;
+        try { await api('ops/backup',{}); await operations(); message('Backup verified and restored successfully to a separate test copy.'); }
+        finally { if(b.isConnected) b.disabled=false; }
+      } else if(b.id==='apply-reward') {
         const form=$('#reserve-form');
         const code=form.elements.reward_code.value.trim().toUpperCase();
         const quote=await api('reservation-quote',{item_id:form.dataset.id,reward_code:code});
@@ -397,7 +460,7 @@
       $('#reservation-price').innerHTML=priceBreakdown(item.price);
       $('#confirm-reservation').disabled=!!event.target.value.trim();
       $('#reward-status').textContent=event.target.value.trim()?'Apply this code to check your final total.':'No reward applied.';
-    } else if(event.target.id==='catalog-search') filterCatalog();
+    } else if(event.target.id==='catalog-search') { clearTimeout(catalogTimer); catalogTimer=setTimeout(()=>filterCatalog(),200); }
     else if(event.target.closest('#delivery-form, #reward-form')) preserveStep();
   });
   window.addEventListener('hashchange',()=>{
